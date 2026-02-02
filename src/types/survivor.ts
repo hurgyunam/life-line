@@ -18,6 +18,14 @@ export type SurvivorAction =
   | '연구 중'
   | '대기 중'
 
+/** 개인 소지품 */
+export interface SurvivorInventory {
+  /** 당근 개수 */
+  carrot: number
+  /** 식수 개수 */
+  water: number
+}
+
 export interface Survivor {
   id: string
   name: string
@@ -32,4 +40,6 @@ export interface Survivor {
   thirst: number
   /** 지루함 (0=매우 지루함, 100=만족/재미있음) */
   boredom: number
+  /** 개인 소지품 */
+  inventory: SurvivorInventory
 }
