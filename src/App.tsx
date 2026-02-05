@@ -1,7 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomNav, type NavPage } from '@/components/layout/BottomNav'
-import { loadLastSave } from '@/utils/gameStorage'
+import {
+  loadLastSave,
+  getSettings,
+  getLastLoadedId,
+  overwriteSave,
+} from '@/utils/gameStorage'
 import { GameHeader } from '@/components/layout/GameHeader'
 import { Dashboard } from '@/components/pages/Dashboard'
 import { Settings } from '@/components/pages/Settings'
@@ -37,6 +42,26 @@ function App() {
   useEffect(() => {
     completeDueActivities({ year, hour, minute })
   }, [year, hour, minute, completeDueActivities])
+
+  // 자동 저장: 주기(분)마다 현재 세이브 덮어쓰기
+  const lastSaveRef = useRef(Date.now())
+  useEffect(() => {
+    const intervalMinutes = getSettings().autoSaveIntervalMinutes
+    if (intervalMinutes <= 0) return
+
+    const id = setInterval(() => {
+      const lastLoadedId = getLastLoadedId()
+      if (!lastLoadedId) return
+      const now = Date.now()
+      const elapsedMinutes = (now - lastSaveRef.current) / (60 * 1000)
+      if (elapsedMinutes >= intervalMinutes) {
+        overwriteSave(lastLoadedId)
+        lastSaveRef.current = now
+      }
+    }, 30 * 1000) // 30초마다 체크
+
+    return () => clearInterval(id)
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center md:p-4">
