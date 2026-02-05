@@ -2,22 +2,22 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomNav, type NavPage } from '@/components/BottomNav'
 import { GameHeader } from '@/components/GameHeader'
+import { Dashboard } from '@/components/Dashboard'
 import { Settings } from '@/components/Settings'
-import { SurvivorList } from '@/components/SurvivorList'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
 
 const pageKeys: Record<NavPage, string> = {
-  survivors: 'page.survivors',
-  research: 'page.research',
   dashboard: 'page.dashboard',
-  regions: 'page.regions',
   settings: 'page.settings',
+  quest: 'page.quest',
+  campResources: 'page.campResources',
+  activityLog: 'page.activityLog',
 }
 
 function App() {
   const { t, i18n } = useTranslation()
-  const [currentPage, setCurrentPage] = useState<NavPage>('survivors')
+  const [currentPage, setCurrentPage] = useState<NavPage>('dashboard')
 
   useEffect(() => {
     document.documentElement.lang = i18n.language
@@ -43,11 +43,9 @@ function App() {
           </h1>
         </header>
         <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-24">
-          {currentPage === 'survivors' && (
-            <SurvivorList survivors={survivors} />
-          )}
+          {currentPage === 'dashboard' && <Dashboard survivors={survivors} />}
           {currentPage === 'settings' && <Settings />}
-          {currentPage !== 'survivors' && currentPage !== 'settings' && (
+          {(currentPage === 'quest' || currentPage === 'campResources' || currentPage === 'activityLog') && (
             <div className="flex items-center justify-center min-h-[200px]">
               <p className="text-gray-500">{t('page.comingSoon')}</p>
             </div>
