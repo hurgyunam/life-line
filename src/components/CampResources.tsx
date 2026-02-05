@@ -1,31 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import {
-  Trees,
-  Mountain,
-  Gem,
-  Flower2,
-  Shield,
-  Droplet,
-  Cherry,
-  Carrot,
-  LeafyGreen,
-  Wheat,
-} from 'lucide-react'
 import { CAMP_RESOURCES, type CampResource } from '@/types/resource'
 import { useCampResourceStore } from '@/stores/campResourceStore'
-
-const resourceIcons: Record<string, React.ReactNode> = {
-  wood: <Trees className="h-5 w-5" />,
-  stone: <Mountain className="h-5 w-5" />,
-  ironOre: <Gem className="h-5 w-5" />,
-  cotton: <Flower2 className="h-5 w-5" />,
-  leather: <Shield className="h-5 w-5" />,
-  water: <Droplet className="h-5 w-5" />,
-  wildStrawberry: <Cherry className="h-5 w-5" />,
-  potato: <Carrot className="h-5 w-5" />,
-  corn: <LeafyGreen className="h-5 w-5" />,
-  wheat: <Wheat className="h-5 w-5" />,
-}
+import { RESOURCE_ICONS } from '@/constants/resourceIcons'
 
 function ResourceChip({
   labelKey,
@@ -37,7 +13,7 @@ function ResourceChip({
   iconKey?: string
 }) {
   const { t } = useTranslation()
-  const icon = iconKey ? resourceIcons[iconKey] : null
+  const icon = iconKey ? RESOURCE_ICONS[iconKey as CampResource] : null
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-gray-800 shadow-sm ring-1 ring-gray-200/60">
       <span className="flex items-center gap-2">

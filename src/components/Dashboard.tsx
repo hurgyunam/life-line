@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Survivor } from '@/types/survivor'
 import { SurvivorList } from '@/components/SurvivorList'
+import { RegionList } from '@/components/RegionList'
 
 interface DashboardTile {
   id: string
@@ -219,6 +220,8 @@ export function Dashboard({ survivors }: DashboardProps) {
   const popupContent =
     popupPage === 'survivors' ? (
       <SurvivorList survivors={survivors} />
+    ) : popupPage === 'regions' ? (
+      <RegionList />
     ) : popupPage ? (
       <div className="flex items-center justify-center min-h-[200px]">
         <p className="text-gray-500">{t('page.comingSoon')}</p>
