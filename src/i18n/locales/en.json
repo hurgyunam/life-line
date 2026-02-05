@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "survivors": "Survivors",
+    "research": "Research",
+    "dashboard": "Dashboard",
+    "regions": "Regions",
+    "settings": "Settings"
+  },
+  "page": {
+    "survivors": "Survivor List",
+    "research": "Research Tree",
+    "dashboard": "Dashboard",
+    "regions": "Region List",
+    "settings": "Settings",
+    "comingSoon": "Coming soon."
+  },
+  "gameHeader": {
+    "timeFormat": "Pioneer Year {{year}}, {{hour}}:{{minute}}",
+    "pause": "Pause",
+    "speed": "{{multiplier}}x"
+  },
+  "survivorList": {
+    "name": "Name",
+    "age": "Age",
+    "status": "Status",
+    "currentAction": "Current Action",
+    "detailExpand": "Expand details",
+    "detailCollapse": "Collapse details",
+    "ageSuffix": " yrs",
+    "searchingFood": "Searching for food"
+  },
+  "survivorDetail": {
+    "name": "Name",
+    "age": "Age",
+    "status": "Status",
+    "currentAction": "Current Action",
+    "inventory": "Personal Inventory",
+    "carrotCount": "{{count}} carrots",
+    "waterCount": "{{count}} waters",
+    "eatCarrot": "Eat carrot",
+    "drinkWater": "Drink water",
+    "activities": "Activities",
+    "searchFood": "Search for food ({{hours}}h)",
+    "searchWater": "Search for water ({{hours}}h)",
+    "searchSurvivor": "Search for survivor ({{hours}}h)",
+    "doResearch": "Research",
+    "inProgress": "In progress",
+    "hoursRequired": "{{hours}}h required",
+    "statusIndicators": "Status Indicators",
+    "hunger": "Hunger",
+    "tiredness": "Tiredness",
+    "thirst": "Thirst",
+    "boredom": "Boredom"
+  },
+  "status": {
+    "hungry": "Hungry",
+    "bored": "Bored",
+    "tired": "Tired",
+    "stressed": "Stressed",
+    "healthy": "Healthy",
+    "satisfied": "Satisfied"
+  },
+  "action": {
+    "farming_carrots": "Farming carrots",
+    "mining_stones": "Mining stones",
+    "chopping_wood": "Chopping wood",
+    "resting": "Resting",
+    "cooking": "Cooking",
+    "sleeping": "Sleeping",
+    "researching": "Researching",
+    "waiting": "Waiting",
+    "searching_food": "Searching for food"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageKo": "한국어",
+    "languageEn": "English"
+  }
+}

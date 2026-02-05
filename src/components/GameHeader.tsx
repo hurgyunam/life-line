@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
-import { useGameTimeStore, type GameSpeed } from '../stores/gameTimeStore'
+import { useTranslation } from 'react-i18next'
+import { useGameTimeStore, type GameSpeed } from '@/stores/gameTimeStore'
 
 const TICK_INTERVAL_MS = 100
 
 export function GameHeader() {
-  const { year, hour, minute, isPaused, speed, setPaused, setSpeed, tick } =
+  const { t } = useTranslation()
+  const { year, hour, minute, isPaused, speed, setPaused, setSpeed } =
     useGameTimeStore()
 
   useEffect(() => {
@@ -14,12 +16,16 @@ export function GameHeader() {
     return () => clearInterval(id)
   }, [])
 
-  const timeLabel = `개척왕 ${year}년 ${hour}시 ${minute}분`
+  const timeLabel = t('gameHeader.timeFormat', {
+    year,
+    hour: String(hour).padStart(2, '0'),
+    minute: String(minute).padStart(2, '0'),
+  })
 
-  const speedOptions: { value: GameSpeed; label: string }[] = [
-    { value: 1, label: '1배속' },
-    { value: 2, label: '2배속' },
-    { value: 3, label: '3배속' },
+  const speedOptions: { value: GameSpeed; key: string }[] = [
+    { value: 1, key: 'gameHeader.speed' },
+    { value: 2, key: 'gameHeader.speed' },
+    { value: 3, key: 'gameHeader.speed' },
   ]
 
   return (
@@ -41,9 +47,9 @@ export function GameHeader() {
             }`}
             aria-pressed={isPaused}
           >
-            일시정지
+            {t('gameHeader.pause')}
           </button>
-          {speedOptions.map(({ value, label }) => {
+          {speedOptions.map(({ value, key }) => {
             const active = !isPaused && speed === value
             return (
               <button
@@ -57,7 +63,7 @@ export function GameHeader() {
                 }`}
                 aria-pressed={active}
               >
-                {label}
+                {t(key, { multiplier: value })}
               </button>
             )
           })}
