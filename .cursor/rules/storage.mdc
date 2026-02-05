@@ -1,0 +1,48 @@
+---
+description: localStorage 저장/영속성 규칙 - 세이브 관리, 마이그레이션
+globs: src/utils/**/*.ts, src/stores/**/*.ts, src/components/pages/Settings.tsx
+alwaysApply: false
+---
+
+# 저장/영속성 규칙
+
+## 저장 범위
+
+- **저장 대상**: `survivorStore`, `regionCampStore` (생존자·지역·시설 데이터)
+- **미저장**: `gameTimeStore`, `campResourceStore` — 저장 시 해당 Store를 추가할지 기획과 맞춰 결정
+
+## localStorage 키 네이밍
+
+- 접두사 `life-line-` 사용 (예: `life-line-saves`)
+- 키는 `src/utils/gameStorage.ts`에 상수로 정의
+
+## 저장 로직 위치
+
+- 세이브/로드 로직은 `@/utils/gameStorage.ts`에 집중
+- Store는 persist 미들웨어 없이 순수 상태만 관리
+
+## 저장 형식 변경 시 마이그레이션
+
+저장 구조를 바꿀 때는 **기존 데이터 마이그레이션**을 반드시 고려한다.
+
+```typescript
+// ✅ GOOD: 이전 형식 감지 후 마이그레이션
+function getStorageData(): StorageData {
+  const raw = localStorage.getItem(STORAGE_KEY)
+  if (!raw) {
+    // 이전 단일 세이브 형식이 있으면 마이그레이션
+    const legacy = migrateFromLegacyFormat()
+    if (legacy) return legacy
+    return { saves: [], lastLoadedId: null }
+  }
+  return JSON.parse(raw)
+}
+```
+
+- 이전 키(`life-line-survivor`, `life-line-region` 등)가 있으면 새 형식으로 변환 후 저장
+- 마이그레이션 후 이전 키는 제거
+
+## 설정 페이지 패턴
+
+- 세이브 관리 등 저장 관련 UI는 **설정 → 타일 클릭 → 모달** 패턴 사용
+- 모달 내: 목록 + 액션 버튼(새로 저장, 불러오기, 삭제)
