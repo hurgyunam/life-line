@@ -38,7 +38,7 @@ export function SurvivorDetailRow({ survivor, isExpanded }: SurvivorDetailRowPro
   const minute = useGameTimeStore((state) => state.minute)
   const advanceByMinutes = useGameTimeStore((state) => state.advanceByMinutes)
 
-  const eatCarrot = useSurvivorStore((state) => state.eatCarrot)
+  const eatWildStrawberry = useSurvivorStore((state) => state.eatWildStrawberry)
   const drinkWater = useSurvivorStore((state) => state.drinkWater)
   const pendingActivities = useSurvivorStore((state) => state.pendingActivities)
   const startSearchFood = useSurvivorStore((state) => state.startSearchFood)
@@ -81,14 +81,14 @@ export function SurvivorDetailRow({ survivor, isExpanded }: SurvivorDetailRowPro
           <div className="border-t border-gray-200 pt-3">
             <p className="mb-2 text-xs font-medium text-gray-500">{t('survivorDetail.inventory')}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="text-gray-700">{t('survivorDetail.carrotCount', { count: survivor.inventory.carrot })}</span>
+              <span className="text-gray-700">{t('survivorDetail.wildStrawberryCount', { count: survivor.inventory.wildStrawberry })}</span>
               <button
                 type="button"
-                onClick={() => eatCarrot(survivor.id)}
-                disabled={survivor.inventory.carrot <= 0}
+                onClick={() => eatWildStrawberry(survivor.id)}
+                disabled={survivor.inventory.wildStrawberry <= 0}
                 className="rounded bg-amber-500 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {t('survivorDetail.eatCarrot')}
+                {t('survivorDetail.eatWildStrawberry')}
               </button>
               <span className="text-gray-700">{t('survivorDetail.waterCount', { count: survivor.inventory.water })}</span>
               <button

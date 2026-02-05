@@ -1,28 +1,17 @@
 import { create } from 'zustand'
 import { CAMP_RESOURCES_INITIAL } from '@/constants/gameConfig'
+import type { CampResource } from '@/types/resource'
 
-export type CampResourceKey =
-  | 'wood'
-  | 'stone'
-  | 'ironOre'
-  | 'cotton'
-  | 'leather'
-  | 'water'
-  | 'wildStrawberry'
-  | 'potato'
-  | 'corn'
-  | 'wheat'
-
-export type CampResourceQuantities = Record<CampResourceKey, number>
+export type CampResourceQuantities = Record<CampResource, number>
 
 interface CampResourceState {
   quantities: CampResourceQuantities
-  getQuantity: (key: CampResourceKey) => number
-  addQuantity: (key: CampResourceKey, amount: number) => void
-  setQuantity: (key: CampResourceKey, amount: number) => void
+  getQuantity: (key: CampResource) => number
+  addQuantity: (key: CampResource, amount: number) => void
+  setQuantity: (key: CampResource, amount: number) => void
 }
 
-const initialQuantities = { ...CAMP_RESOURCES_INITIAL } as CampResourceQuantities
+const initialQuantities = { ...CAMP_RESOURCES_INITIAL }
 
 export const useCampResourceStore = create<CampResourceState>((set, get) => ({
   quantities: initialQuantities,

@@ -41,9 +41,9 @@
     "status": "상태",
     "currentAction": "현재 행동",
     "inventory": "개인 소지품",
-    "carrotCount": "당근 {{count}}개",
+    "wildStrawberryCount": "야생 딸기 {{count}}개",
     "waterCount": "식수 {{count}}개",
-    "eatCarrot": "당근 먹기",
+    "eatWildStrawberry": "야생 딸기 먹기",
     "drinkWater": "식수 마시기",
     "activities": "활동",
     "searchFood": "음식 찾아보기 ({{hours}}시간)",
@@ -67,7 +67,7 @@
     "satisfied": "만족"
   },
   "action": {
-    "farming_carrots": "당근 농사 진행중",
+    "farming_wildStrawberries": "야생 딸기 수확 중",
     "mining_stones": "광산에서 돌 캐는 중",
     "chopping_wood": "나무 베는 중",
     "resting": "휴식 중",
