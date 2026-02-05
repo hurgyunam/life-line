@@ -4,6 +4,7 @@ import { BottomNav, type NavPage } from '@/components/BottomNav'
 import { GameHeader } from '@/components/GameHeader'
 import { Dashboard } from '@/components/Dashboard'
 import { Settings } from '@/components/Settings'
+import { CampResources } from '@/components/CampResources'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
 
@@ -45,7 +46,8 @@ function App() {
         <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-24">
           {currentPage === 'dashboard' && <Dashboard survivors={survivors} />}
           {currentPage === 'settings' && <Settings />}
-          {(currentPage === 'quest' || currentPage === 'campResources' || currentPage === 'activityLog') && (
+          {currentPage === 'campResources' && <CampResources />}
+          {(currentPage === 'quest' || currentPage === 'activityLog') && (
             <div className="flex items-center justify-center min-h-[200px]">
               <p className="text-gray-500">{t('page.comingSoon')}</p>
             </div>

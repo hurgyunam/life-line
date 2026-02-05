@@ -90,10 +90,30 @@
     "languageEn": "English",
     "sound": "소리",
     "notifications": "알림",
-    "about": "정보"
+    "about": "정보",
+    "aboutTitle": "정보",
+    "aboutAppName": "Life Line",
+    "aboutVersion": "버전 {{version}}",
+    "aboutLicenses": "오픈소스 라이선스",
+    "aboutLucide": "아이콘: Lucide (lucide.dev) · ISC/MIT License · © Cole Bemis, Lucide Contributors"
   },
   "common": {
     "cancel": "취소",
     "close": "닫기"
+  },
+  "campResources": {
+    "construction": "건축/조합",
+    "consumable": "소비",
+    "water": "식수",
+    "food": "식량",
+    "wood": "나무",
+    "stone": "돌",
+    "ironOre": "철광석",
+    "cotton": "목화",
+    "leather": "가죽",
+    "wildStrawberry": "야생 딸기",
+    "potato": "감자",
+    "corn": "옥수수",
+    "wheat": "밀"
   }
 }

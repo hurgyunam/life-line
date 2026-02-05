@@ -41,3 +41,28 @@ export const SURVIVOR_BALANCE = {
     WATER: 10,
   },
 } as const
+
+/** 캠프 자원 분류 및 종류 */
+export const CAMP_RESOURCES = {
+  /** 건축/조합용 자원 */
+  CONSTRUCTION: ['wood', 'stone', 'ironOre', 'cotton', 'leather'] as const,
+  /** 소비용 자원 */
+  CONSUMABLE: {
+    water: 'water',
+    food: ['wildStrawberry', 'potato', 'corn', 'wheat'] as const,
+  },
+} as const
+
+/** 캠프 자원 초기 수량 */
+export const CAMP_RESOURCES_INITIAL: Record<string, number> = {
+  wood: 0,
+  stone: 0,
+  ironOre: 0,
+  cotton: 0,
+  leather: 0,
+  water: 0,
+  wildStrawberry: 0,
+  potato: 0,
+  corn: 0,
+  wheat: 0,
+}

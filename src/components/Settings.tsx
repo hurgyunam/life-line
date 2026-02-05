@@ -106,9 +106,12 @@ function PlaceholderIcon({ className }: { className?: string }) {
   )
 }
 
+const APP_VERSION = '1.0.0'
+
 export function Settings() {
   const { t, i18n } = useTranslation()
   const [showLanguageModal, setShowLanguageModal] = useState(false)
+  const [showAboutModal, setShowAboutModal] = useState(false)
 
   const handleLanguageChange = (lng: SupportedLanguage) => {
     i18n.changeLanguage(lng)
@@ -137,6 +140,7 @@ export function Settings() {
       id: 'about',
       icon: <InfoIcon className="h-8 w-8" />,
       labelKey: 'settings.about',
+      onClick: () => setShowAboutModal(true),
     },
   ]
 
@@ -211,6 +215,42 @@ export function Settings() {
               className="mt-4 w-full rounded-xl bg-gray-200 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-300"
             >
               {t('common.cancel')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 정보(About) 모달 - 앱 정보 및 오픈소스 라이선스 */}
+      {showAboutModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowAboutModal(false)}
+        >
+          <div
+            className="w-full max-w-sm max-h-[85vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mb-4 text-lg font-semibold text-gray-800">
+              {t('settings.aboutTitle')}
+            </h3>
+            <p className="mb-1 text-base font-medium text-gray-900">
+              {t('settings.aboutAppName')}
+            </p>
+            <p className="mb-4 text-sm text-gray-500">
+              {t('settings.aboutVersion', { version: APP_VERSION })}
+            </p>
+            <h4 className="mb-2 text-sm font-medium text-gray-700">
+              {t('settings.aboutLicenses')}
+            </h4>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              {t('settings.aboutLucide')}
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowAboutModal(false)}
+              className="mt-6 w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              {t('common.close')}
             </button>
           </div>
         </div>
