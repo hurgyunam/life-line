@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { REGIONS } from '@/constants/regions'
 import { getRegionDisplayInfos } from '@/utils/regionName'
-import { RegionDetailRow } from '@/components/RegionDetailRow'
+import { RegionDetailRow } from '@/components/region/RegionDetailRow'
 
 function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (

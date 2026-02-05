@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Survivor, SurvivorStatus } from '@/types/survivor'
 import { useSurvivorStore } from '@/stores/survivorStore'
-import { SurvivorDetailRow } from '@/components/SurvivorDetailRow'
+import { SurvivorDetailRow } from '@/components/survivor/SurvivorDetailRow'
 
 interface SurvivorListProps {
   survivors: Survivor[]
