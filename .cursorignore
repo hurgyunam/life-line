@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+storybook-static/
+
+# Lock files (large, rarely needed for coding context)
+yarn.lock
+
+# Storybook boilerplate (Button, Header, Page - not part of game logic)
+src/stories/
+
+# Design/planning notes (Obsidian journal, not code)
+docs/life-line-journal/

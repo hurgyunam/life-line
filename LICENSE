@@ -22,6 +22,48 @@ SOFTWARE.
 
 ---
 
-This project uses Lucide Icons (lucide-react), which is licensed under the ISC License.
-Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2026 as part of Feather (MIT).
-All other copyright (c) for Lucide are held by Lucide Contributors 2026.
+## Third-Party Licenses
+
+This project uses the following open source software:
+
+### Dependencies (Production)
+
+- **React** (react, react-dom) — MIT License  
+  Copyright (c) Meta Platforms, Inc. and affiliates.
+
+- **i18next** — MIT License  
+  Copyright (c) i18next.
+
+- **i18next-browser-languagedetector** — MIT License  
+  Copyright (c) i18next.
+
+- **react-i18next** — MIT License  
+  Copyright (c) 2015-present i18next.
+
+- **Lucide Icons** (lucide-react) — ISC License / MIT License  
+  Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2026 as part of Feather (MIT).  
+  All other copyright (c) for Lucide are held by Lucide Contributors 2026.
+
+- **Zustand** — MIT License  
+  Copyright (c) 2019 Paul Henschel.
+
+### Dev Dependencies (Build Tools)
+
+- **Vite** — MIT License  
+  Copyright (c) 2019-present, VoidZero Inc. and Vite contributors.
+
+- **TypeScript** — Apache License 2.0  
+  Copyright (c) Microsoft Corporation.
+
+- **Tailwind CSS** — MIT License  
+  Copyright (c) Tailwind Labs, Inc.
+
+- **PostCSS** — MIT License  
+  Copyright 2013 Andrey Sitnik.
+
+- **Autoprefixer** — MIT License  
+  Copyright 2013 Andrey Sitnik.
+
+- **@vitejs/plugin-react** — MIT License
+
+- **Storybook** (storybook, @storybook/*) — MIT License

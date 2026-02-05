@@ -94,8 +94,7 @@
     "aboutTitle": "정보",
     "aboutAppName": "Life Line",
     "aboutVersion": "버전 {{version}}",
-    "aboutLicenses": "오픈소스 라이선스",
-    "aboutLucide": "아이콘: Lucide (lucide.dev) · ISC/MIT License · © Cole Bemis, Lucide Contributors"
+    "aboutLicenses": "오픈소스 라이선스"
   },
   "common": {
     "cancel": "취소",

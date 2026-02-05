@@ -17,3 +17,9 @@ alwaysApply: true
 - **Yarn v1**: 프로젝트가 Yarn v1(Classic)을 사용합니다. `yarn dlx`는 Yarn 2+ 전용이므로 사용 불가. 일회성 CLI 실행 시 `npm create <package>` 또는 `npx`를 사용하세요.
 - **Node.js 18**: 현재 Node 18 환경입니다. Storybook 10.x는 Node 20.19+ 또는 22.12+가 필요하므로, Storybook 8.x를 사용 중입니다.
 - **PowerShell**: Windows PowerShell에서는 `&&` 명령 체이닝이 지원되지 않습니다. `;`를 사용하세요.
+
+## 컨텍스트 절약 참고
+
+- **핵심 게임 코드**: `src/components/`, `src/stores/`, `src/constants/`, `src/types/`
+- **Storybook**: `src/stories/`는 기본 보일러플레이트(Button, Header, Page)이며 게임 로직과 무관함
+- **기획 문서**: `docs/life-line-journal/`는 Obsidian 노트로, 코드 수정 시 참고하지 않음
