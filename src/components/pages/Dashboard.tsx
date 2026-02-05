@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { Survivor } from '@/types/survivor'
 import { SurvivorList } from '@/components/survivor/SurvivorList'
 import { RegionList } from '@/components/region/RegionList'
+import { GuidelinesList } from '@/components/guidelines/GuidelinesList'
 
 interface DashboardTile {
   id: string
@@ -11,7 +12,7 @@ interface DashboardTile {
   onClick?: () => void
 }
 
-export type DashboardPopup = 'survivors' | 'research' | 'regions' | null
+export type DashboardPopup = 'survivors' | 'research' | 'regions' | 'guidelines' | null
 
 interface DashboardProps {
   survivors: Survivor[]
@@ -139,6 +140,26 @@ function CalendarIcon({ className }: { className?: string }) {
   )
 }
 
+function GuidelinesIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+      <path d="M8 8h8" />
+      <path d="M8 12h8" />
+      <path d="M8 16h4" />
+    </svg>
+  )
+}
+
 function PlaceholderIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -180,6 +201,12 @@ export function Dashboard({ survivors }: DashboardProps) {
       onClick: () => setPopupPage('regions'),
     },
     {
+      id: 'guidelines',
+      icon: <GuidelinesIcon className="h-8 w-8" />,
+      labelKey: 'nav.guidelines',
+      onClick: () => setPopupPage('guidelines'),
+    },
+    {
       id: 'stats',
       icon: <ChartIcon className="h-8 w-8" />,
       labelKey: 'dashboard.stats',
@@ -215,13 +242,17 @@ export function Dashboard({ survivors }: DashboardProps) {
         ? 'page.research'
         : popupPage === 'regions'
           ? 'page.regions'
-          : ''
+          : popupPage === 'guidelines'
+            ? 'page.guidelines'
+            : ''
 
   const popupContent =
     popupPage === 'survivors' ? (
       <SurvivorList survivors={survivors} />
     ) : popupPage === 'regions' ? (
       <RegionList />
+    ) : popupPage === 'guidelines' ? (
+      <GuidelinesList />
     ) : popupPage ? (
       <div className="flex items-center justify-center min-h-[200px]">
         <p className="text-gray-500">{t('page.comingSoon')}</p>

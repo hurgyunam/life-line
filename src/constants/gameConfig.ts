@@ -42,6 +42,21 @@ export const SURVIVOR_BALANCE = {
     WILD_STRAWBERRY: 10,
     WATER: 10,
   },
+  
+  // 식량별 배고픔 회복량
+  FOOD_HUNGER_GAIN: {
+    wildStrawberry: 15,
+    potato: 20,
+    corn: 25,
+    wheat: 30,
+  },
+  
+  // 침낭별 피곤함 회복량
+  SLEEPING_BAG_TIREDNESS_GAIN: {
+    sleepingBag1: 20,
+    sleepingBag2: 30,
+    sleepingBag3: 40,
+  },
 } as const
 
 /** 자동 저장 주기 옵션 (분 단위, 0 = 끄기) */

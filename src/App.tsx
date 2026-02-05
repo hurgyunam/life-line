@@ -66,14 +66,14 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center md:p-4">
       {/* 모바일 뷰포트: PC에서는 가운데 정렬+여백, 모바일에서는 전체 화면 */}
-      <main className="relative w-full max-w-[428px] min-h-screen md:min-h-[calc(100dvh-2rem)] bg-white md:shadow-xl md:rounded-2xl overflow-hidden flex flex-col">
+      <main className="relative w-full max-w-[428px] h-screen md:h-[calc(100dvh-2rem)] bg-white md:shadow-xl md:rounded-2xl overflow-hidden flex flex-col">
         <GameHeader />
         <header className="shrink-0 p-4 pb-2">
           <h1 className="text-2xl font-bold text-gray-800">
             {t(pageKeys[currentPage])}
           </h1>
         </header>
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-24">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-[calc(57px+0.5rem+max(1rem,env(safe-area-inset-bottom))+0.5rem)]">
           {currentPage === 'dashboard' && <Dashboard survivors={survivors} />}
           {currentPage === 'settings' && <Settings />}
           {currentPage === 'campResources' && <CampResources />}

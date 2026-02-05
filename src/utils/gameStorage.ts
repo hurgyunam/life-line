@@ -14,10 +14,24 @@ const SETTINGS_KEY = 'life-line-settings'
 export interface GameSettings {
   /** 자동 저장 주기(분). 0 = 끄기 */
   autoSaveIntervalMinutes: number
+  /** 행동 지침 값들 (숫자 또는 문자열) */
+  guidelinesValues: Record<string, number | string>
+  /** 행동 지침 순서 (지침 키 배열) */
+  guidelinesOrder: string[]
 }
 
 const SETTINGS_DEFAULTS: GameSettings = {
   autoSaveIntervalMinutes: 0,
+  guidelinesValues: {
+    hungerThreshold: 30,
+    foodResource: 'wildStrawberry' as string, // 기본값은 야생딸기
+    tirednessThreshold: 30,
+    sleepingBag: 'sleepingBag1' as string, // 기본값은 침낭1
+    thirstThreshold: 30,
+    boredomThreshold: 30,
+    restPlace: 'bareGround' as string, // 기본값은 맨 땅
+  },
+  guidelinesOrder: ['hungerThreshold', 'tirednessThreshold', 'thirstThreshold', 'boredomThreshold'],
 }
 
 function getSettingsRaw(): unknown {
@@ -37,6 +51,15 @@ function migrateSettings(parsed: unknown): GameSettings {
     const obj = parsed as Record<string, unknown>
     if (typeof obj.autoSaveIntervalMinutes === 'number') {
       result.autoSaveIntervalMinutes = Math.max(0, obj.autoSaveIntervalMinutes)
+    }
+    if (obj.guidelinesValues && typeof obj.guidelinesValues === 'object') {
+      result.guidelinesValues = {
+        ...SETTINGS_DEFAULTS.guidelinesValues,
+        ...(obj.guidelinesValues as Record<string, number | string>),
+      }
+    }
+    if (Array.isArray(obj.guidelinesOrder)) {
+      result.guidelinesOrder = obj.guidelinesOrder as string[]
     }
   }
   return result

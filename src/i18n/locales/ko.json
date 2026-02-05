@@ -1,1 +1,186 @@
-{"nav": {"survivors": "생존자", "research": "연구", "dashboard": "대시보드", "regions": "지역", "settings": "설정", "quest": "퀘스트", "campResources": "재고", "activityLog": "활동 로그"}, "page": {"survivors": "생존자 리스트", "research": "연구 트리", "dashboard": "대시보드", "regions": "지역 리스트", "settings": "설정", "quest": "퀘스트", "campResources": "재고", "activityLog": "활동 로그", "comingSoon": "준비 중입니다."}, "gameHeader": {"timeFormat": "개척왕 {{year}}년 {{hour}}시 {{minute}}분", "pause": "일시정지", "speed": "{{multiplier}}배속"}, "survivorList": {"name": "이름", "age": "나이", "status": "상태", "currentAction": "현재 행동", "detailExpand": "상세 펼치기", "detailCollapse": "상세 접기", "ageSuffix": "세", "searchingFood": "음식 찾아보기"}, "survivorDetail": {"name": "이름", "age": "나이", "status": "상태", "currentAction": "현재 행동", "inventory": "개인 소지품", "wildStrawberryCount": "야생 딸기 {{count}}개", "waterCount": "식수 {{count}}개", "eatWildStrawberry": "야생 딸기 먹기", "drinkWater": "식수 마시기", "activities": "활동", "searchFood": "음식 찾아보기 ({{hours}}시간)", "searchWater": "식수 찾아보기 ({{hours}}시간)", "searchSurvivor": "또 다른 생존자 찾아보기 ({{hours}}시간)", "doResearch": "연구하기", "inProgress": "진행 중", "hoursRequired": "{{hours}}시간 소요", "statusIndicators": "상태 지수", "hunger": "배고픔", "tiredness": "피곤함", "thirst": "목마름", "boredom": "지루함"}, "status": {"hungry": "굶주림", "bored": "지루함", "tired": "피로", "stressed": "스트레스", "healthy": "건강함", "satisfied": "만족"}, "action": {"farming_wildStrawberries": "야생 딸기 수확 중", "mining_stones": "광산에서 돌 캐는 중", "chopping_wood": "나무 베는 중", "resting": "휴식 중", "cooking": "요리 중", "sleeping": "수면 중", "researching": "연구 중", "waiting": "대기 중", "searching_food": "음식 찾아보기"}, "dashboard": {"stats": "통계", "resources": "자원", "map": "지도", "calendar": "캘린더"}, "settings": {"title": "설정", "save": "저장", "saved": "저장됨", "saveManagement": "세이브 관리", "saveNew": "새로 저장", "saveEmpty": "저장된 세이브가 없습니다.", "saveLoad": "불러오기", "saveDelete": "삭제", "saveSurvivors": "생존자 {{count}}명", "saveNameManual": "수동 저장 {{date}}", "saveNameAuto": "자동 저장 {{date}}", "autoSaveInterval": "자동 저장 주기", "autoSaveOff": "끄기", "autoSaveMinutes": "{{count}}분마다", "language": "언어", "languageKo": "한국어", "languageEn": "English", "sound": "소리", "notifications": "알림", "about": "정보", "aboutTitle": "정보", "aboutAppName": "Life Line", "aboutVersion": "버전 {{version}}", "aboutLicenses": "오픈소스 라이선스"}, "common": {"cancel": "취소", "close": "닫기"}, "campResources": {"construction": "건축/조합", "consumable": "소비", "water": "식수", "food": "식량", "wood": "나무", "stone": "돌", "ironOre": "철광석", "cotton": "목화", "leather": "가죽", "wildStrawberry": "야생 딸기", "potato": "감자", "corn": "옥수수", "wheat": "밀"}, "regionList": {"name": "지역명", "resourceDistribution": "자원 분포", "detailExpand": "상세 펼치기", "detailCollapse": "상세 접기", "richRegionSuffix": "풍부 지역", "buildCamp": "캠프 건설", "buildFacility": "시설 건설", "facilityBuildTitle": "시설 선택", "allFacilitiesInstalled": "설치 가능한 시설이 없습니다.", "installedFacilities": "설치된 시설"}, "facility": {"workshop": "작업장", "farm": "농장", "storage": "창고", "well": "우물", "kitchen": "주방"}}
+{
+  "nav": {
+    "survivors": "생존자",
+    "research": "연구",
+    "dashboard": "대시보드",
+    "regions": "지역",
+    "settings": "설정",
+    "quest": "퀘스트",
+    "campResources": "재고",
+    "activityLog": "활동 로그",
+    "guidelines": "행동 지침"
+  },
+  "page": {
+    "survivors": "생존자 리스트",
+    "research": "연구 트리",
+    "dashboard": "대시보드",
+    "regions": "지역 리스트",
+    "settings": "설정",
+    "quest": "퀘스트",
+    "campResources": "재고",
+    "activityLog": "활동 로그",
+    "comingSoon": "준비 중입니다.",
+    "guidelines": "행동 지침"
+  },
+  "guidelines": {
+    "list": [
+      "배고픔이 30 이하면 야생딸기를 섭취한다."
+    ],
+    "templates": {
+      "hungerThreshold": "배고픔이 {{hungerThreshold}} 이하면 {{foodResource}}을(를) 섭취한다.",
+      "tirednessThreshold": "피곤함이 {{tirednessThreshold}} 이하면 남는 {{sleepingBag}}에서 취침한다.",
+      "thirstThreshold": "목마름이 {{thirstThreshold}} 이하일 경우 식수를 섭취한다.",
+      "boredomThreshold": "지루함이 {{boredomThreshold}} 이하일 경우 {{restPlace}}에서 휴식한다."
+    },
+    "editValue": "값 수정",
+    "value": "값",
+    "selectFood": "식량 선택",
+    "selectSleepingBag": "침낭 선택",
+    "selectRestPlace": "휴식 장소 선택",
+    "stock": "재고",
+    "hungerGain": "배고픔 회복",
+    "tirednessGain": "피곤함 회복",
+    "researchRequired": "연구를 통해 제작해야만 사용 가능합니다.",
+    "sleepingBags": {
+      "sleepingBag1": "침낭 1",
+      "sleepingBag2": "침낭 2",
+      "sleepingBag3": "침낭 3"
+    },
+    "restPlaces": {
+      "bareGround": "맨 땅",
+      "hammock": "흔들의자",
+      "wrestlingMat": "씨름대",
+      "soccerField": "축구장"
+    },
+    "moveUp": "위로 이동",
+    "moveDown": "아래로 이동"
+  },
+  "gameHeader": {
+    "timeFormat": "개척왕 {{year}}년 {{hour}}시 {{minute}}분",
+    "pause": "일시정지",
+    "speed": "{{multiplier}}배속"
+  },
+  "survivorList": {
+    "name": "이름",
+    "age": "나이",
+    "status": "상태",
+    "currentAction": "현재 행동",
+    "detailExpand": "상세 펼치기",
+    "detailCollapse": "상세 접기",
+    "ageSuffix": "세",
+    "searchingFood": "음식 찾아보기"
+  },
+  "survivorDetail": {
+    "name": "이름",
+    "age": "나이",
+    "status": "상태",
+    "currentAction": "현재 행동",
+    "inventory": "개인 소지품",
+    "wildStrawberryCount": "야생 딸기 {{count}}개",
+    "waterCount": "식수 {{count}}개",
+    "eatWildStrawberry": "야생 딸기 먹기",
+    "drinkWater": "식수 마시기",
+    "activities": "활동",
+    "searchFood": "음식 찾아보기 ({{hours}}시간)",
+    "searchWater": "식수 찾아보기 ({{hours}}시간)",
+    "searchSurvivor": "또 다른 생존자 찾아보기 ({{hours}}시간)",
+    "doResearch": "연구하기",
+    "inProgress": "진행 중",
+    "hoursRequired": "{{hours}}시간 소요",
+    "statusIndicators": "상태 지수",
+    "hunger": "배고픔",
+    "tiredness": "피곤함",
+    "thirst": "목마름",
+    "boredom": "지루함"
+  },
+  "status": {
+    "hungry": "굶주림",
+    "bored": "지루함",
+    "tired": "피로",
+    "stressed": "스트레스",
+    "healthy": "건강함",
+    "satisfied": "만족"
+  },
+  "action": {
+    "farming_wildStrawberries": "야생 딸기 수확 중",
+    "mining_stones": "광산에서 돌 캐는 중",
+    "chopping_wood": "나무 베는 중",
+    "resting": "휴식 중",
+    "cooking": "요리 중",
+    "sleeping": "수면 중",
+    "researching": "연구 중",
+    "waiting": "대기 중",
+    "searching_food": "음식 찾아보기"
+  },
+  "dashboard": {
+    "stats": "통계",
+    "resources": "자원",
+    "map": "지도",
+    "calendar": "캘린더"
+  },
+  "settings": {
+    "title": "설정",
+    "save": "저장",
+    "saved": "저장됨",
+    "saveManagement": "세이브 관리",
+    "saveNew": "새로 저장",
+    "saveEmpty": "저장된 세이브가 없습니다.",
+    "saveLoad": "불러오기",
+    "saveDelete": "삭제",
+    "saveSurvivors": "생존자 {{count}}명",
+    "saveNameManual": "수동 저장 {{date}}",
+    "saveNameAuto": "자동 저장 {{date}}",
+    "autoSaveInterval": "자동 저장 주기",
+    "autoSaveOff": "끄기",
+    "autoSaveMinutes": "{{count}}분마다",
+    "language": "언어",
+    "languageKo": "한국어",
+    "languageEn": "English",
+    "sound": "소리",
+    "notifications": "알림",
+    "about": "정보",
+    "aboutTitle": "정보",
+    "aboutAppName": "Life Line",
+    "aboutVersion": "버전 {{version}}",
+    "aboutLicenses": "오픈소스 라이선스"
+  },
+  "common": {
+    "cancel": "취소",
+    "close": "닫기"
+  },
+  "campResources": {
+    "construction": "건축/조합",
+    "consumable": "소비",
+    "restPlaces": "휴식 장소",
+    "water": "식수",
+    "food": "식량",
+    "wood": "나무",
+    "stone": "돌",
+    "ironOre": "철광석",
+    "cotton": "목화",
+    "leather": "가죽",
+    "wildStrawberry": "야생 딸기",
+    "potato": "감자",
+    "corn": "옥수수",
+    "wheat": "밀"
+  },
+  "regionList": {
+    "name": "지역명",
+    "resourceDistribution": "자원 분포",
+    "detailExpand": "상세 펼치기",
+    "detailCollapse": "상세 접기",
+    "richRegionSuffix": "풍부 지역",
+    "buildCamp": "캠프 건설",
+    "buildFacility": "시설 건설",
+    "facilityBuildTitle": "시설 선택",
+    "allFacilitiesInstalled": "설치 가능한 시설이 없습니다.",
+    "installedFacilities": "설치된 시설"
+  },
+  "facility": {
+    "workshop": "작업장",
+    "farm": "농장",
+    "storage": "창고",
+    "well": "우물",
+    "kitchen": "주방"
+  }
+}
