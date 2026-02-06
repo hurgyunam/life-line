@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { Survivor } from '@/types/survivor'
 import { GAME_TIME_CONFIG, ACTIVITY_BALANCE, SURVIVOR_BALANCE } from '@/constants/gameConfig'
+import { decaySurvivors } from '@/logic/survivorDecay'
 
 /** 게임 시각 (진행 중 활동 완료 시점 비교용) */
 export interface GameTimePoint {
@@ -70,6 +71,8 @@ interface SurvivorState {
   startSearchFood: (survivorId: string, endAt: GameTimePoint) => void
   /** 현재 시각 기준으로 만료된 진행 중 활동 완료 처리 */
   completeDueActivities: (now: GameTimePoint) => void
+  /** 게임 분 경과에 따른 수치 감소 (배속 반영된 분 수 전달) */
+  decayByMinutes: (gameMinutes: number) => void
   searchWater: (survivorId: string) => void
   searchSurvivor: (survivorId: string) => void
   doResearch: (survivorId: string) => void
@@ -159,6 +162,10 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
       }),
     })
   },
+  decayByMinutes: (gameMinutes) =>
+    set((state) => ({
+      survivors: decaySurvivors(state.survivors, gameMinutes),
+    })),
   searchWater: (survivorId) =>
     set((state) => ({
       survivors: state.survivors.map((s) => {
