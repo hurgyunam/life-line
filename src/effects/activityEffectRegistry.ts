@@ -1,11 +1,11 @@
 /**
- * 이펙트 레지스트리
+ * 활동 이펙트 레지스트리
  *
  * 활동 실행 시 발생하는 부수 효과(survivor 욕구 업데이트, 캠프 재고 변경 등)를
  * activityStore에서 직접 참조하지 않고 실행할 수 있게 합니다.
  *
  * - activityStore는 이펙트 타입과 payload만 전달
- * - 실제 구현은 registerEffects에서 등록 (survivorStore, campResourceStore 등 주입)
+ * - 실제 구현은 activityEffectHandlers에서 등록 (survivorStore, campResourceStore 등 주입)
  * - 결합도를 낮추고 테스트 시 mock 주입 가능
  */
 
