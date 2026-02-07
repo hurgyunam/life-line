@@ -4,6 +4,7 @@ import type { Survivor } from '@/types/survivor'
 import { SurvivorList } from '@/components/survivor/SurvivorList'
 import { RegionList } from '@/components/region/RegionList'
 import { GuidelinesList } from '@/components/guidelines/GuidelinesList'
+import { TimeController } from '@/components/layout/TimeController'
 
 interface DashboardTile {
   id: string
@@ -299,7 +300,7 @@ export function Dashboard({ survivors }: DashboardProps) {
               <button
                 type="button"
                 onClick={() => setPopupPage(null)}
-                className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+                className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                 aria-label={t('common.close')}
               >
                 <svg
@@ -318,6 +319,9 @@ export function Dashboard({ survivors }: DashboardProps) {
                 </svg>
               </button>
             </header>
+            <div className="shrink-0 border-b border-gray-200 px-4 py-3">
+              <TimeController />
+            </div>
             <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4">{popupContent}</div>
           </div>
         </div>

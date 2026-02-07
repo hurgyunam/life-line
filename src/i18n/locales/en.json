@@ -68,7 +68,8 @@
     "detailExpand": "Expand details",
     "detailCollapse": "Collapse details",
     "ageSuffix": " yrs",
-    "searchingFood": "Searching for food"
+    "searchingFood": "Searching for food",
+    "empty": "No survivors."
   },
   "survivorDetail": {
     "name": "Name",
@@ -92,6 +93,19 @@
     "tiredness": "Tiredness",
     "thirst": "Thirst",
     "boredom": "Boredom"
+  },
+  "reservedActivity": {
+    "title": "Activity Queue",
+    "empty": "No scheduled activities.",
+    "dragHandle": "Drag to reorder",
+    "execute": "Execute",
+    "remove": "Cancel",
+    "eatWildStrawberry": "Eat wild strawberry",
+    "drinkWater": "Drink water",
+    "searchFood": "Search for food",
+    "searchWater": "Search for water",
+    "searchSurvivor": "Search for survivor",
+    "doResearch": "Research"
   },
   "status": {
     "hungry": "Hungry",
@@ -146,7 +160,9 @@
   },
   "common": {
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "prev": "Prev",
+    "next": "Next"
   },
   "campResources": {
     "construction": "Construction/Crafting",

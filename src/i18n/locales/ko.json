@@ -68,7 +68,8 @@
     "detailExpand": "상세 펼치기",
     "detailCollapse": "상세 접기",
     "ageSuffix": "세",
-    "searchingFood": "음식 찾아보기"
+    "searchingFood": "음식 찾아보기",
+    "empty": "생존자가 없습니다."
   },
   "survivorDetail": {
     "name": "이름",
@@ -92,6 +93,19 @@
     "tiredness": "피곤함",
     "thirst": "목마름",
     "boredom": "지루함"
+  },
+  "reservedActivity": {
+    "title": "활동 예약",
+    "empty": "예약된 활동이 없습니다.",
+    "dragHandle": "드래그하여 순서 변경",
+    "execute": "실행",
+    "remove": "취소",
+    "eatWildStrawberry": "야생 딸기 먹기",
+    "drinkWater": "식수 마시기",
+    "searchFood": "음식 찾아보기",
+    "searchWater": "식수 찾아보기",
+    "searchSurvivor": "생존자 찾아보기",
+    "doResearch": "연구하기"
   },
   "status": {
     "hungry": "굶주림",
@@ -146,7 +160,9 @@
   },
   "common": {
     "cancel": "취소",
-    "close": "닫기"
+    "close": "닫기",
+    "prev": "이전",
+    "next": "다음"
   },
   "campResources": {
     "construction": "건축/조합",
