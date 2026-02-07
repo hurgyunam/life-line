@@ -76,7 +76,7 @@
     "age": "Age",
     "status": "Status",
     "currentAction": "Current Action",
-    "inventory": "Personal Inventory",
+    "stock": "Stock",
     "wildStrawberryCount": "{{count}} wild strawberries",
     "waterCount": "{{count}} waters",
     "eatWildStrawberry": "Eat wild strawberry",

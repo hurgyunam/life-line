@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameTimeStore, type GameSpeed } from '@/stores/gameTimeStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
+import { useActivityStore } from '@/stores/activityStore'
 import { GAME_TIME_CONFIG } from '@/constants/gameConfig'
 
 const TICK_INTERVAL_MS = 100
@@ -17,7 +18,8 @@ export function GameHeader() {
       useGameTimeStore.getState().tick()
       if (!gameState.isPaused) {
         const gameMinutes = gameState.speed * GAME_TIME_CONFIG.MINUTES_PER_TICK_BASE
-        useSurvivorStore.getState().decayByMinutes(gameMinutes)
+        const pendingActivities = useActivityStore.getState().pendingActivities
+        useSurvivorStore.getState().decayByMinutes(gameMinutes, pendingActivities)
       }
     }, TICK_INTERVAL_MS)
     return () => clearInterval(id)

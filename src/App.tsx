@@ -13,6 +13,7 @@ import { Settings } from '@/components/pages/Settings'
 import { CampResources } from '@/components/camp/CampResources'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
+import { useActivityStore } from '@/stores/activityStore'
 
 const pageKeys: Record<NavPage, string> = {
   dashboard: 'page.dashboard',
@@ -37,8 +38,8 @@ function App() {
   const year = useGameTimeStore((state) => state.year)
   const hour = useGameTimeStore((state) => state.hour)
   const minute = useGameTimeStore((state) => state.minute)
-  const completeDueActivities = useSurvivorStore((state) => state.completeDueActivities)
-  const processReservedActivities = useSurvivorStore((state) => state.processReservedActivities)
+  const completeDueActivities = useActivityStore((state) => state.completeDueActivities)
+  const processReservedActivities = useActivityStore((state) => state.processReservedActivities)
 
   useEffect(() => {
     completeDueActivities({ year, hour, minute })

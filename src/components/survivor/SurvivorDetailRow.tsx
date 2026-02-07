@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
+import { useActivityStore } from '@/stores/activityStore'
+import { useCampResourceStore } from '@/stores/campResourceStore'
 import type { Survivor } from '@/types/survivor'
 import { GaugeBar } from '@/components/ui/GaugeBar'
 import { statusColors } from '@/components/survivor/SurvivorList'
@@ -38,13 +40,15 @@ export function SurvivorDetailRow({ survivor, isExpanded }: SurvivorDetailRowPro
   const minute = useGameTimeStore((state) => state.minute)
   const advanceByMinutes = useGameTimeStore((state) => state.advanceByMinutes)
 
+  const wildStrawberry = useCampResourceStore((s) => s.getQuantity('wildStrawberry'))
+  const water = useCampResourceStore((s) => s.getQuantity('water'))
   const eatWildStrawberry = useSurvivorStore((state) => state.eatWildStrawberry)
   const drinkWater = useSurvivorStore((state) => state.drinkWater)
-  const pendingActivities = useSurvivorStore((state) => state.pendingActivities)
-  const startSearchFood = useSurvivorStore((state) => state.startSearchFood)
-  const searchWater = useSurvivorStore((state) => state.searchWater)
-  const searchSurvivor = useSurvivorStore((state) => state.searchSurvivor)
-  const doResearch = useSurvivorStore((state) => state.doResearch)
+  const pendingActivities = useActivityStore((state) => state.pendingActivities)
+  const startSearchFood = useActivityStore((state) => state.startSearchFood)
+  const searchWater = useActivityStore((state) => state.searchWater)
+  const searchSurvivor = useActivityStore((state) => state.searchSurvivor)
+  const doResearch = useActivityStore((state) => state.doResearch)
 
   if (!isExpanded) return null
 
@@ -79,22 +83,22 @@ export function SurvivorDetailRow({ survivor, isExpanded }: SurvivorDetailRowPro
             </div>
           </div>
           <div className="border-t border-gray-200 pt-3">
-            <p className="mb-2 text-xs font-medium text-gray-500">{t('survivorDetail.inventory')}</p>
+            <p className="mb-2 text-xs font-medium text-gray-500">{t('survivorDetail.stock')}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="text-gray-700">{t('survivorDetail.wildStrawberryCount', { count: survivor.inventory.wildStrawberry })}</span>
+              <span className="text-gray-700">{t('survivorDetail.wildStrawberryCount', { count: wildStrawberry })}</span>
               <button
                 type="button"
                 onClick={() => eatWildStrawberry(survivor.id)}
-                disabled={survivor.inventory.wildStrawberry <= 0}
+                disabled={wildStrawberry <= 0}
                 className="rounded bg-amber-500 px-2.5 py-1 text-xs font-medium text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {t('survivorDetail.eatWildStrawberry')}
               </button>
-              <span className="text-gray-700">{t('survivorDetail.waterCount', { count: survivor.inventory.water })}</span>
+              <span className="text-gray-700">{t('survivorDetail.waterCount', { count: water })}</span>
               <button
                 type="button"
                 onClick={() => drinkWater(survivor.id)}
-                disabled={survivor.inventory.water <= 0}
+                disabled={water <= 0}
                 className="rounded bg-sky-500 px-2.5 py-1 text-xs font-medium text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {t('survivorDetail.drinkWater')}
@@ -125,7 +129,7 @@ export function SurvivorDetailRow({ survivor, isExpanded }: SurvivorDetailRowPro
                 type="button"
                 onClick={() => {
                   advanceByMinutes(ACTIVITY_BALANCE.WATER_SEARCH.DURATION_HOURS * GAME_TIME_CONFIG.MINUTES_PER_HOUR)
-                  searchWater(survivor.id)
+                  searchWater()
                 }}
                 className="rounded border border-sky-300 bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-800 hover:bg-sky-100"
                 title={t('survivorDetail.hoursRequired', { hours: ACTIVITY_BALANCE.WATER_SEARCH.DURATION_HOURS })}
@@ -136,7 +140,7 @@ export function SurvivorDetailRow({ survivor, isExpanded }: SurvivorDetailRowPro
                 type="button"
                 onClick={() => {
                   advanceByMinutes(ACTIVITY_BALANCE.SURVIVOR_SEARCH.DURATION_HOURS * GAME_TIME_CONFIG.MINUTES_PER_HOUR)
-                  searchSurvivor(survivor.id)
+                  searchSurvivor()
                 }}
                 className="rounded border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-100"
                 title={t('survivorDetail.hoursRequired', { hours: ACTIVITY_BALANCE.SURVIVOR_SEARCH.DURATION_HOURS })}
@@ -145,7 +149,7 @@ export function SurvivorDetailRow({ survivor, isExpanded }: SurvivorDetailRowPro
               </button>
               <button
                 type="button"
-                onClick={() => doResearch(survivor.id)}
+                onClick={() => doResearch()}
                 className="rounded border border-violet-300 bg-violet-50 px-2.5 py-1 text-xs font-medium text-violet-800 hover:bg-violet-100"
               >
                 {t('survivorDetail.doResearch')}

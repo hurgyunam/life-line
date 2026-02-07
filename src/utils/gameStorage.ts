@@ -1,5 +1,6 @@
 import i18n from '@/i18n'
-import { useSurvivorStore, syncNextActivityId, syncNextReservedId, type PendingActivity, type ReservedActivity } from '@/stores/survivorStore'
+import { useSurvivorStore } from '@/stores/survivorStore'
+import { useActivityStore, syncNextActivityId, syncNextReservedId, type PendingActivity, type ReservedActivity } from '@/stores/activityStore'
 import { useRegionCampStore } from '@/stores/regionCampStore'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useCampResourceStore, type CampResourceQuantities } from '@/stores/campResourceStore'
@@ -165,6 +166,7 @@ export function getSaveList(): SaveSlot[] {
 /** 현재 상태를 새 세이브 슬롯에 저장 */
 export function createSave(name?: string): SaveSlot {
   const survivorState = useSurvivorStore.getState()
+  const activityState = useActivityStore.getState()
   const regionState = useRegionCampStore.getState()
   const gameTimeState = useGameTimeStore.getState()
   const campResourceState = useCampResourceStore.getState()
@@ -177,10 +179,10 @@ export function createSave(name?: string): SaveSlot {
     createdAt,
     survivorData: {
       survivors: survivorState.survivors,
-      pendingActivities: survivorState.pendingActivities,
-      reservedActivities: survivorState.reservedActivities,
-      discoveredSurvivorCount: survivorState.discoveredSurvivorCount,
-      researchProgress: survivorState.researchProgress,
+      pendingActivities: activityState.pendingActivities,
+      reservedActivities: activityState.reservedActivities,
+      discoveredSurvivorCount: activityState.discoveredSurvivorCount,
+      researchProgress: activityState.researchProgress,
     },
     regionData: {
       regionsWithCamp: regionState.regionsWithCamp,
@@ -211,7 +213,25 @@ export function loadSave(saveId: string): boolean {
   if (!slot) return false
 
   const { survivorData, regionData, gameTimeData, campResourceData } = slot
-  const survivors = Array.isArray(survivorData.survivors) ? survivorData.survivors : useSurvivorStore.getState().survivors
+  let survivors: Survivor[] = Array.isArray(survivorData.survivors) ? survivorData.survivors : useSurvivorStore.getState().survivors
+
+  // 구버전: 생존자 개인 소지품 → 캠프 재고로 마이그레이션
+  const legacySurvivors = survivors as Array<Survivor & { inventory?: { wildStrawberry?: number; water?: number } }>
+  if (legacySurvivors.some((s) => s.inventory)) {
+    const totalWildStrawberry = legacySurvivors.reduce((sum, s) => sum + (s.inventory?.wildStrawberry ?? 0), 0)
+    const totalWater = legacySurvivors.reduce((sum, s) => sum + (s.inventory?.water ?? 0), 0)
+    survivors = legacySurvivors.map(({ inventory: _inv, ...s }) => s as Survivor)
+    if (!campResourceData?.quantities || typeof campResourceData.quantities !== 'object') {
+      useCampResourceStore.setState({
+        quantities: {
+          ...CAMP_RESOURCES_INITIAL,
+          wildStrawberry: totalWildStrawberry,
+          water: totalWater,
+        },
+      })
+    }
+  }
+
   const pendingActivities: PendingActivity[] = Array.isArray(survivorData.pendingActivities)
     ? survivorData.pendingActivities
     : []
@@ -219,8 +239,8 @@ export function loadSave(saveId: string): boolean {
     ? survivorData.reservedActivities
     : []
 
-  useSurvivorStore.setState({
-    survivors,
+  useSurvivorStore.setState({ survivors })
+  useActivityStore.setState({
     pendingActivities,
     reservedActivities,
     activityStartTimes: {},
@@ -297,6 +317,7 @@ export function overwriteSave(saveId: string): boolean {
   if (!slot) return false
 
   const survivorState = useSurvivorStore.getState()
+  const activityState = useActivityStore.getState()
   const regionState = useRegionCampStore.getState()
   const gameTimeState = useGameTimeStore.getState()
   const campResourceState = useCampResourceStore.getState()
@@ -306,10 +327,10 @@ export function overwriteSave(saveId: string): boolean {
   slot.name = formatAutoSaveName(createdAt)
   slot.survivorData = {
     survivors: survivorState.survivors,
-    pendingActivities: survivorState.pendingActivities,
-    reservedActivities: survivorState.reservedActivities,
-    discoveredSurvivorCount: survivorState.discoveredSurvivorCount,
-    researchProgress: survivorState.researchProgress,
+    pendingActivities: activityState.pendingActivities,
+    reservedActivities: activityState.reservedActivities,
+    discoveredSurvivorCount: activityState.discoveredSurvivorCount,
+    researchProgress: activityState.researchProgress,
   }
   slot.regionData = {
     regionsWithCamp: regionState.regionsWithCamp,
