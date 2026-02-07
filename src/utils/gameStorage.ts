@@ -223,6 +223,8 @@ export function loadSave(saveId: string): boolean {
     survivors,
     pendingActivities,
     reservedActivities,
+    activityStartTimes: {},
+    guidelineSatisfyingPhase: {},
     discoveredSurvivorCount: survivorData.discoveredSurvivorCount ?? 0,
     researchProgress: survivorData.researchProgress ?? 0,
   })

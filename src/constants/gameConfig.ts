@@ -30,6 +30,18 @@ export const ACTIVITY_BALANCE = {
   RESEARCH: {
     PROGRESS_GAIN: 1,
   },
+
+  /** 예약 활동 → 실행까지 대기 시간 (게임 분). 활동 예약 목록에 보여지는 시간 */
+  QUEUE_WAIT_MINUTES: {
+    eatWildStrawberry: 10,
+    drinkWater: 5,
+    searchFood: 15,
+    searchWater: 15,
+    searchSurvivor: 30,
+    doResearch: 30,
+    restWithSleepingBag: 30,
+    restAtPlace: 15,
+  },
 } as const
 
 export const SURVIVOR_BALANCE = {
@@ -59,12 +71,15 @@ export const SURVIVOR_BALANCE = {
     wheat: 30,
   },
   
-  // 침낭별 피곤함 회복량
-  SLEEPING_BAG_TIREDNESS_GAIN: {
+  /** 침낭별 시간당 피곤함 회복량 (1시간에 N 회복) */
+  SLEEPING_BAG_TIREDNESS_GAIN_PER_HOUR: {
     sleepingBag1: 20,
     sleepingBag2: 30,
     sleepingBag3: 40,
   },
+
+  /** 휴식 장소 시간당 지루함 회복량 (1시간에 N 회복) */
+  REST_PLACE_BOREDOM_GAIN_PER_HOUR: 20,
 } as const
 
 /** 자동 저장 주기 옵션 (분 단위, 0 = 끄기) */

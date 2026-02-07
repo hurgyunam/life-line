@@ -105,7 +105,9 @@
     "searchFood": "음식 찾아보기",
     "searchWater": "식수 찾아보기",
     "searchSurvivor": "생존자 찾아보기",
-    "doResearch": "연구하기"
+    "doResearch": "연구하기",
+    "restWithSleepingBag": "침낭에서 취침",
+    "restAtPlace": "휴식 장소에서 휴식"
   },
   "status": {
     "hungry": "굶주림",

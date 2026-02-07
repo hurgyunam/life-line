@@ -2,8 +2,13 @@ import { create } from 'zustand'
 import { arrayMove } from '@dnd-kit/sortable'
 import type { Survivor } from '@/types/survivor'
 import { GAME_TIME_CONFIG, ACTIVITY_BALANCE, SURVIVOR_BALANCE } from '@/constants/gameConfig'
-import { decaySurvivors } from '@/logic/survivorDecay'
+import { decaySurvivors, computeStatusFromStats } from '@/logic/survivorDecay'
+import { getGuidelineActivityForSurvivor } from '@/logic/guidelineActivities'
+import { getSettings } from '@/utils/gameStorage'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
+import { useRestPlaceStore } from '@/stores/restPlaceStore'
+import type { SleepingBag } from '@/types/sleepingBag'
+import type { RestPlace } from '@/types/restPlace'
 
 /** 게임 시각 (진행 중 활동 완료 시점 비교용) */
 export interface GameTimePoint {
@@ -16,8 +21,10 @@ export interface GameTimePoint {
 export interface PendingActivity {
   id: string
   survivorId: string
-  type: 'searchFood'
+  type: 'searchFood' | 'restWithSleepingBag' | 'restAtPlace'
   endAt: GameTimePoint
+  sleepingBag?: SleepingBag
+  restPlace?: RestPlace
 }
 
 /** 예약 활동 타입 */
@@ -28,6 +35,8 @@ export type ReservedActivityType =
   | 'searchWater'
   | 'searchSurvivor'
   | 'doResearch'
+  | 'restWithSleepingBag'
+  | 'restAtPlace'
 
 /** 예약 활동 (버튼 클릭 시 리스트에 추가, 실행 시 실제 효과 적용) */
 export interface ReservedActivity {
@@ -75,12 +84,22 @@ const initialSurvivors: Survivor[] = [
   { id: '8', name: '윤수아', age: 26, status: 'bored', currentAction: 'waiting', hunger: 55, tiredness: 50, thirst: 40, boredom: 25, inventory: { ...defaultInventory } },
 ]
 
+/** 생존자별 첫 번째 예약 활동의 시작 시각 */
+interface ActivityStartRecord {
+  activityId: string
+  startedAt: GameTimePoint
+}
+
 interface SurvivorState {
   survivors: Survivor[]
   /** 진행 중 활동 (1시간 지나면 완료) */
   pendingActivities: PendingActivity[]
   /** 예약 활동 (실행 전 대기 중) */
   reservedActivities: ReservedActivity[]
+  /** 생존자별 첫 번째 예약 활동 시작 시각 (대기 시간 경과 후 실행용) */
+  activityStartTimes: Record<string, ActivityStartRecord>
+  /** 생존자별 욕구 충족 중인 지침 키 (threshold 이하→100까지 반복용) */
+  guidelineSatisfyingPhase: Record<string, string | null>
   /** 발견한 생존자 수 (또 다른 생존자 찾아보기) */
   discoveredSurvivorCount: number
   /** 연구 진행도 */
@@ -106,6 +125,8 @@ interface SurvivorState {
   executeReservedActivity: (id: string) => boolean
   /** 예약 활동 순서 변경 (해당 생존자 내에서) */
   reorderReservedActivities: (survivorId: string, oldIndex: number, newIndex: number) => void
+  /** 행동 지침 조건에 부합하는 생존자에게 지침 활동을 예약 최상단에 삽입 */
+  insertGuidelineActivitiesIfNeeded: () => void
   /** 맨 위 예약부터 자동 실행 (게임 시간 tick 시 호출) */
   processReservedActivities: () => void
 }
@@ -142,10 +163,14 @@ export function syncNextActivityId(activities: PendingActivity[]) {
   nextActivityId = max + 1
 }
 
+const QUEUE_WAIT = ACTIVITY_BALANCE.QUEUE_WAIT_MINUTES
+
 export const useSurvivorStore = create<SurvivorState>((set, get) => ({
   survivors: initialSurvivors,
   pendingActivities: [],
   reservedActivities: [],
+  activityStartTimes: {},
+  guidelineSatisfyingPhase: {},
   discoveredSurvivorCount: 0,
   researchProgress: 0,
   eatWildStrawberry: (survivorId) =>
@@ -178,9 +203,17 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
       ],
     })),
   cancelPendingActivity: (id) =>
-    set((state) => ({
-      pendingActivities: state.pendingActivities.filter((a) => a.id !== id),
-    })),
+    set((state) => {
+      const activity = state.pendingActivities.find((a) => a.id === id)
+      const phaseClears: Record<string, string | null> = {}
+      if (activity && (activity.type === 'restWithSleepingBag' || activity.type === 'restAtPlace')) {
+        phaseClears[activity.survivorId] = null
+      }
+      return {
+        pendingActivities: state.pendingActivities.filter((a) => a.id !== id),
+        guidelineSatisfyingPhase: { ...state.guidelineSatisfyingPhase, ...phaseClears },
+      }
+    }),
   completeDueActivities: (now) => {
     const state = get()
     const nowM = toMinutes(now)
@@ -188,6 +221,8 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
     if (due.length === 0) return
     const remaining = state.pendingActivities.filter((a) => !due.includes(a))
     const newActivities: PendingActivity[] = [...remaining]
+    const phaseClears: Record<string, string | null> = {}
+
     for (const a of due) {
       if (a.type === 'searchFood') {
         newActivities.push({
@@ -198,25 +233,66 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
         })
       }
     }
-    set({
-      pendingActivities: newActivities,
-      survivors: state.survivors.map((s) => {
-        const completed = due.filter((a) => a.survivorId === s.id && a.type === 'searchFood')
-        if (completed.length === 0) return s
-        return {
-          ...s,
+
+    const survivorUpdates = state.survivors.map((s) => {
+      const completedFood = due.filter((a) => a.survivorId === s.id && a.type === 'searchFood')
+      const completedRest = due.filter((a) => a.survivorId === s.id && (a.type === 'restWithSleepingBag' || a.type === 'restAtPlace'))
+      if (completedFood.length === 0 && completedRest.length === 0) return s
+      let updated = { ...s }
+      if (completedFood.length > 0) {
+        updated = {
+          ...updated,
           inventory: {
-            ...s.inventory,
-            wildStrawberry: s.inventory.wildStrawberry + completed.length * ACTIVITY_BALANCE.FOOD_SEARCH.WILD_STRAWBERRY_GAIN,
+            ...updated.inventory,
+            wildStrawberry: updated.inventory.wildStrawberry + completedFood.length * ACTIVITY_BALANCE.FOOD_SEARCH.WILD_STRAWBERRY_GAIN,
           },
         }
-      }),
+      }
+      for (const rest of completedRest) {
+        if (rest.type === 'restWithSleepingBag') {
+          updated = { ...updated, tiredness: 100 }
+          phaseClears[s.id] = null
+        }
+        if (rest.type === 'restAtPlace') {
+          updated = { ...updated, boredom: 100 }
+          phaseClears[s.id] = null
+        }
+      }
+      return updated
+    })
+
+    set({
+      pendingActivities: newActivities,
+      survivors: survivorUpdates,
+      guidelineSatisfyingPhase: { ...state.guidelineSatisfyingPhase, ...phaseClears },
     })
   },
   decayByMinutes: (gameMinutes) =>
-    set((state) => ({
-      survivors: decaySurvivors(state.survivors, gameMinutes),
-    })),
+    set((state) => {
+      let survivors = decaySurvivors(state.survivors, gameMinutes)
+      const gainPerMinute = gameMinutes / 60
+      const restSleep = state.pendingActivities.filter((a) => a.type === 'restWithSleepingBag')
+      const restPlace = state.pendingActivities.filter((a) => a.type === 'restAtPlace')
+      survivors = survivors.map((s) => {
+        const sleep = restSleep.find((a) => a.survivorId === s.id)
+        const rest = restPlace.find((a) => a.survivorId === s.id)
+        let tiredness = s.tiredness
+        let boredom = s.boredom
+        if (sleep?.sleepingBag) {
+          const gainPerHour = SURVIVOR_BALANCE.SLEEPING_BAG_TIREDNESS_GAIN_PER_HOUR[sleep.sleepingBag]
+          tiredness = Math.min(100, tiredness + gainPerHour * gainPerMinute)
+        }
+        if (rest) {
+          const gainPerHour = SURVIVOR_BALANCE.REST_PLACE_BOREDOM_GAIN_PER_HOUR
+          boredom = Math.min(100, boredom + gainPerHour * gainPerMinute)
+        }
+        if (tiredness !== s.tiredness || boredom !== s.boredom) {
+          return { ...s, tiredness, boredom, status: computeStatusFromStats({ ...s, tiredness, boredom }) }
+        }
+        return s
+      })
+      return { survivors }
+    }),
   searchWater: (survivorId) =>
     set((state) => ({
       survivors: state.survivors.map((s) => {
@@ -286,6 +362,46 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
       case 'doResearch':
         get().doResearch(reserved.survivorId)
         break
+      case 'restWithSleepingBag': {
+        const settings = getSettings()
+        const sleepingBag = (settings.guidelinesValues.sleepingBag as SleepingBag) ?? 'sleepingBag1'
+        const gainPerHour = SURVIVOR_BALANCE.SLEEPING_BAG_TIREDNESS_GAIN_PER_HOUR[sleepingBag]
+        const survivor = state.survivors.find((s) => s.id === reserved.survivorId)
+        if (!survivor) return false
+        const need = Math.max(0, 100 - survivor.tiredness)
+        const hoursNeeded = Math.ceil(need / gainPerHour) || 1
+        const endAt = addMinutesToPoint(now, hoursNeeded * GAME_TIME_CONFIG.MINUTES_PER_HOUR)
+        set((s) => ({
+          pendingActivities: [
+            ...s.pendingActivities,
+            { id: genActivityId(), survivorId: reserved.survivorId, type: 'restWithSleepingBag', endAt, sleepingBag },
+          ],
+        }))
+        break
+      }
+      case 'restAtPlace': {
+        const settings = getSettings()
+        const restPlace = (settings.guidelinesValues.restPlace as RestPlace) ?? 'bareGround'
+        const restPlaceStore = useRestPlaceStore.getState()
+        const stock = restPlaceStore.getStock(restPlace)
+        if (stock <= 0) return false
+        if (restPlace !== 'bareGround') {
+          restPlaceStore.setStock(restPlace, stock - 1)
+        }
+        const gainPerHour = SURVIVOR_BALANCE.REST_PLACE_BOREDOM_GAIN_PER_HOUR
+        const survivor = state.survivors.find((s) => s.id === reserved.survivorId)
+        if (!survivor) return false
+        const need = Math.max(0, 100 - survivor.boredom)
+        const hoursNeeded = Math.ceil(need / gainPerHour) || 1
+        const endAt = addMinutesToPoint(now, hoursNeeded * GAME_TIME_CONFIG.MINUTES_PER_HOUR)
+        set((s) => ({
+          pendingActivities: [
+            ...s.pendingActivities,
+            { id: genActivityId(), survivorId: reserved.survivorId, type: 'restAtPlace', endAt, restPlace },
+          ],
+        }))
+        break
+      }
     }
 
     set((s) => ({
@@ -308,17 +424,102 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
       })
       return { reservedActivities: newArray }
     }),
+  insertGuidelineActivitiesIfNeeded: () => {
+    const state = get()
+    const settings = getSettings()
+    const seenSurvivorIds = new Set<string>()
+    const newReserved: ReservedActivity[] = []
+    const phaseUpdates: Record<string, string | null> = {}
+
+    const hasPendingRest = (survivorId: string, type: 'restWithSleepingBag' | 'restAtPlace') =>
+      state.pendingActivities.some((a) => a.survivorId === survivorId && a.type === type)
+
+    const processSurvivor = (survivor: Survivor, firstActivityType?: ReservedActivityType) => {
+      const phase = state.guidelineSatisfyingPhase[survivor.id] ?? null
+      const result = getGuidelineActivityForSurvivor(survivor, settings, phase)
+      if (result.newPhase !== undefined) {
+        phaseUpdates[survivor.id] = result.newPhase ?? null
+      }
+      if (result.activity && firstActivityType !== result.activity) {
+        if (result.activity === 'restWithSleepingBag' && hasPendingRest(survivor.id, 'restWithSleepingBag')) return
+        if (result.activity === 'restAtPlace' && hasPendingRest(survivor.id, 'restAtPlace')) return
+        newReserved.push({ id: genReservedId(), survivorId: survivor.id, type: result.activity })
+      }
+      return result.activity
+    }
+
+    for (const a of state.reservedActivities) {
+      if (!seenSurvivorIds.has(a.survivorId)) {
+        seenSurvivorIds.add(a.survivorId)
+        const survivor = state.survivors.find((s) => s.id === a.survivorId)
+        if (survivor) {
+          processSurvivor(survivor, a.type)
+        }
+      }
+      newReserved.push(a)
+    }
+
+    for (const survivor of state.survivors) {
+      if (seenSurvivorIds.has(survivor.id)) continue
+      processSurvivor(survivor)
+    }
+
+    const hasChanges =
+      newReserved.length !== state.reservedActivities.length ||
+      Object.keys(phaseUpdates).some((id) => phaseUpdates[id] !== (state.guidelineSatisfyingPhase[id] ?? null))
+    if (hasChanges) {
+      set({
+        reservedActivities: newReserved,
+        guidelineSatisfyingPhase: { ...state.guidelineSatisfyingPhase, ...phaseUpdates },
+      })
+    }
+  },
   processReservedActivities: () => {
+    get().insertGuidelineActivitiesIfNeeded()
     const state = get()
     const busySurvivorIds = new Set(
-      state.pendingActivities.filter((a) => a.type === 'searchFood').map((a) => a.survivorId)
+      state.pendingActivities.map((a) => a.survivorId)
     )
+    const { year, hour, minute } = useGameTimeStore.getState()
+    const now: GameTimePoint = { year, hour, minute }
+    const nowM = toMinutes(now)
+
     const survivorIds = [...new Set(state.reservedActivities.map((a) => a.survivorId))]
+    const updates: Partial<SurvivorState> = { activityStartTimes: { ...state.activityStartTimes } }
+    let startTimesChanged = false
+
     for (const survivorId of survivorIds) {
       if (busySurvivorIds.has(survivorId)) continue
       const first = state.reservedActivities.find((a) => a.survivorId === survivorId)
       if (!first) continue
+
+      const waitMin = QUEUE_WAIT[first.type] ?? 10
+      const record = state.activityStartTimes[survivorId]
+
+      if (!record || record.activityId !== first.id) {
+        updates.activityStartTimes![survivorId] = { activityId: first.id, startedAt: now }
+        startTimesChanged = true
+        continue
+      }
+
+      const startM = toMinutes(record.startedAt)
+      if (nowM < startM + waitMin) continue
+
+      delete updates.activityStartTimes![survivorId]
+      startTimesChanged = true
       get().executeReservedActivity(first.id)
+    }
+
+    for (const survivorId of Object.keys(state.activityStartTimes)) {
+      const hasReserved = state.reservedActivities.some((a) => a.survivorId === survivorId)
+      if (!hasReserved) {
+        delete updates.activityStartTimes![survivorId]
+        startTimesChanged = true
+      }
+    }
+
+    if (startTimesChanged) {
+      set(updates)
     }
   },
 }))
