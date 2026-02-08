@@ -3,13 +3,13 @@
  * guidelinesOrder 순서대로 조건을 확인하여, 첫 번째 부합하는 지침의 활동을 반환합니다.
  */
 
-import type { Survivor } from '@/types/survivor'
-import type { GameSettings } from '@/utils/gameStorage'
-import type { ReservedActivityType } from '@/stores/survivorStore.types'
-import type { FoodResource } from '@/types/resource'
-import type { RestPlace } from '@/types/restPlace'
-import { useRestPlaceStore } from '@/stores/restPlaceStore'
-import { useCampResourceStore } from '@/stores/campResourceStore'
+import type { Survivor } from '@/types/survivor';
+import type { GameSettings } from '@/utils/gameStorage';
+import type { ReservedActivityType } from '@/stores/survivorStore.types';
+import type { FoodResource } from '@/types/resource';
+import type { RestPlace } from '@/types/restPlace';
+import { useRestPlaceStore } from '@/stores/restPlaceStore';
+import { useCampResourceStore } from '@/stores/campResourceStore';
 
 /** 행동 지침에서 파생되는 활동 타입 (일부는 기존 타입과 동일) */
 export type GuidelineActivityType =
@@ -20,7 +20,7 @@ export type GuidelineActivityType =
   | 'restAtPlace'
 
 /** 욕구 충족 수치 (꽉 참 = 100). 이 값에 도달하면 충족 완료 */
-const NEED_SATISFACTION_TARGET = 100
+const NEED_SATISFACTION_TARGET = 100;
 
 /** canExecuteGuideline 결과 */
 interface GuidelineCheckResult {
@@ -37,96 +37,96 @@ interface GuidelineCheckResult {
  * - 100 도달: 충족 완료, 다시 threshold 이하가 될 때까지 대기
  */
 function canExecuteGuideline(
-  survivor: Survivor,
-  guidelineKey: string,
-  settings: GameSettings,
-  satisfyingPhase: string | null
+    survivor: Survivor,
+    guidelineKey: string,
+    settings: GameSettings,
+    satisfyingPhase: string | null
 ): GuidelineCheckResult {
-  const values = settings.guidelinesValues
-  const noMatch = (at: GuidelineActivityType): GuidelineCheckResult => ({
-    canExecute: false,
-    activityType: at,
-    shouldClearPhase: false,
-  })
-  const clearAndNo = (at: GuidelineActivityType): GuidelineCheckResult => ({
-    canExecute: false,
-    activityType: at,
-    shouldClearPhase: true,
-  })
+    const values = settings.guidelinesValues;
+    const noMatch = (at: GuidelineActivityType): GuidelineCheckResult => ({
+        canExecute: false,
+        activityType: at,
+        shouldClearPhase: false,
+    });
+    const clearAndNo = (at: GuidelineActivityType): GuidelineCheckResult => ({
+        canExecute: false,
+        activityType: at,
+        shouldClearPhase: true,
+    });
 
-  switch (guidelineKey) {
+    switch (guidelineKey) {
     case 'hungerThreshold': {
-      const threshold = (values.hungerThreshold as number) ?? 30
-      const foodResource = (values.foodResource as FoodResource) ?? 'wildStrawberry'
-      if (survivor.hunger >= NEED_SATISFACTION_TARGET) return clearAndNo('eatWildStrawberry')
-      const inPhase = satisfyingPhase === 'hungerThreshold'
-      const atOrBelowThreshold = survivor.hunger <= threshold
-      if (!inPhase && !atOrBelowThreshold) return noMatch('eatWildStrawberry')
-      if (foodResource === 'wildStrawberry') {
-        return {
-          canExecute: useCampResourceStore.getState().getQuantity('wildStrawberry') > 0,
-          activityType: 'eatWildStrawberry',
-          shouldClearPhase: false,
+        const threshold = (values.hungerThreshold as number) ?? 30;
+        const foodResource = (values.foodResource as FoodResource) ?? 'wildStrawberry';
+        if (survivor.hunger >= NEED_SATISFACTION_TARGET) return clearAndNo('eatWildStrawberry');
+        const inPhase = satisfyingPhase === 'hungerThreshold';
+        const atOrBelowThreshold = survivor.hunger <= threshold;
+        if (!inPhase && !atOrBelowThreshold) return noMatch('eatWildStrawberry');
+        if (foodResource === 'wildStrawberry') {
+            return {
+                canExecute: useCampResourceStore.getState().getQuantity('wildStrawberry') > 0,
+                activityType: 'eatWildStrawberry',
+                shouldClearPhase: false,
+            };
         }
-      }
-      return noMatch('eatFood')
+        return noMatch('eatFood');
     }
     case 'thirstThreshold': {
-      const threshold = (values.thirstThreshold as number) ?? 30
-      if (survivor.thirst >= NEED_SATISFACTION_TARGET) return clearAndNo('drinkWater')
-      const inPhase = satisfyingPhase === 'thirstThreshold'
-      const atOrBelowThreshold = survivor.thirst <= threshold
-      if (!inPhase && !atOrBelowThreshold) return noMatch('drinkWater')
-      return {
-        canExecute: useCampResourceStore.getState().getQuantity('water') > 0,
-        activityType: 'drinkWater',
-        shouldClearPhase: false,
-      }
+        const threshold = (values.thirstThreshold as number) ?? 30;
+        if (survivor.thirst >= NEED_SATISFACTION_TARGET) return clearAndNo('drinkWater');
+        const inPhase = satisfyingPhase === 'thirstThreshold';
+        const atOrBelowThreshold = survivor.thirst <= threshold;
+        if (!inPhase && !atOrBelowThreshold) return noMatch('drinkWater');
+        return {
+            canExecute: useCampResourceStore.getState().getQuantity('water') > 0,
+            activityType: 'drinkWater',
+            shouldClearPhase: false,
+        };
     }
     case 'tirednessThreshold': {
-      const threshold = (values.tirednessThreshold as number) ?? 30
-      if (survivor.tiredness >= NEED_SATISFACTION_TARGET) return clearAndNo('restWithSleepingBag')
-      const inPhase = satisfyingPhase === 'tirednessThreshold'
-      const atOrBelowThreshold = survivor.tiredness <= threshold
-      if (!inPhase && !atOrBelowThreshold) return noMatch('restWithSleepingBag')
-      return { canExecute: true, activityType: 'restWithSleepingBag', shouldClearPhase: false }
+        const threshold = (values.tirednessThreshold as number) ?? 30;
+        if (survivor.tiredness >= NEED_SATISFACTION_TARGET) return clearAndNo('restWithSleepingBag');
+        const inPhase = satisfyingPhase === 'tirednessThreshold';
+        const atOrBelowThreshold = survivor.tiredness <= threshold;
+        if (!inPhase && !atOrBelowThreshold) return noMatch('restWithSleepingBag');
+        return { canExecute: true, activityType: 'restWithSleepingBag', shouldClearPhase: false };
     }
     case 'boredomThreshold': {
-      const threshold = (values.boredomThreshold as number) ?? 30
-      const restPlace = (values.restPlace as RestPlace) ?? 'bareGround'
-      if (survivor.boredom >= NEED_SATISFACTION_TARGET) return clearAndNo('restAtPlace')
-      const inPhase = satisfyingPhase === 'boredomThreshold'
-      const atOrBelowThreshold = survivor.boredom <= threshold
-      if (!inPhase && !atOrBelowThreshold) return noMatch('restAtPlace')
-      const stock = useRestPlaceStore.getState().getStock(restPlace)
-      return {
-        canExecute: stock > 0,
-        activityType: 'restAtPlace',
-        shouldClearPhase: false,
-      }
+        const threshold = (values.boredomThreshold as number) ?? 30;
+        const restPlace = (values.restPlace as RestPlace) ?? 'bareGround';
+        if (survivor.boredom >= NEED_SATISFACTION_TARGET) return clearAndNo('restAtPlace');
+        const inPhase = satisfyingPhase === 'boredomThreshold';
+        const atOrBelowThreshold = survivor.boredom <= threshold;
+        if (!inPhase && !atOrBelowThreshold) return noMatch('restAtPlace');
+        const stock = useRestPlaceStore.getState().getStock(restPlace);
+        return {
+            canExecute: stock > 0,
+            activityType: 'restAtPlace',
+            shouldClearPhase: false,
+        };
     }
     default:
-      return { canExecute: false, activityType: 'eatWildStrawberry', shouldClearPhase: false }
-  }
+        return { canExecute: false, activityType: 'eatWildStrawberry', shouldClearPhase: false };
+    }
 }
 
 /** GuidelineActivityType → ReservedActivityType 매핑 (실제 store에 있는 타입) */
 export function toReservedActivityType(
-  activity: GuidelineActivityType,
-  _settings: GameSettings
+    activity: GuidelineActivityType,
+    _settings: GameSettings
 ): ReservedActivityType | null {
-  switch (activity) {
+    switch (activity) {
     case 'eatWildStrawberry':
-      return 'eatWildStrawberry'
+        return 'eatWildStrawberry';
     case 'eatFood':
-      return null // 아직 미구현
+        return null; // 아직 미구현
     case 'drinkWater':
-      return 'drinkWater'
+        return 'drinkWater';
     case 'restWithSleepingBag':
-      return 'restWithSleepingBag'
+        return 'restWithSleepingBag';
     case 'restAtPlace':
-      return 'restAtPlace'
-  }
+        return 'restAtPlace';
+    }
 }
 
 export interface GuidelineResult {
@@ -142,26 +142,26 @@ export interface GuidelineResult {
  * - 100 도달 시 phase 초기화, 다시 threshold 이하 대기
  */
 export function getGuidelineActivityForSurvivor(
-  survivor: Survivor,
-  settings: GameSettings,
-  satisfyingPhase: string | null
+    survivor: Survivor,
+    settings: GameSettings,
+    satisfyingPhase: string | null
 ): GuidelineResult {
-  const order = settings.guidelinesOrder ?? [
-    'hungerThreshold',
-    'tirednessThreshold',
-    'thirstThreshold',
-    'boredomThreshold',
-  ]
+    const order = settings.guidelinesOrder ?? [
+        'hungerThreshold',
+        'tirednessThreshold',
+        'thirstThreshold',
+        'boredomThreshold',
+    ];
 
-  for (const key of order) {
-    const result = canExecuteGuideline(survivor, key, settings, satisfyingPhase)
-    if (result.shouldClearPhase && satisfyingPhase === key) {
-      return { activity: null, newPhase: null }
+    for (const key of order) {
+        const result = canExecuteGuideline(survivor, key, settings, satisfyingPhase);
+        if (result.shouldClearPhase && satisfyingPhase === key) {
+            return { activity: null, newPhase: null };
+        }
+        if (result.canExecute) {
+            const reserved = toReservedActivityType(result.activityType, settings);
+            return { activity: reserved, newPhase: key };
+        }
     }
-    if (result.canExecute) {
-      const reserved = toReservedActivityType(result.activityType, settings)
-      return { activity: reserved, newPhase: key }
-    }
-  }
-  return { activity: null, newPhase: undefined }
+    return { activity: null, newPhase: undefined };
 }

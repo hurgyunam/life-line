@@ -1,5 +1,5 @@
-import { create } from 'zustand'
-import type { Facility } from '@/types/facility'
+import { create } from 'zustand';
+import type { Facility } from '@/types/facility';
 
 interface RegionCampState {
   /** 캠프가 건설된 지역 ID 목록 */
@@ -13,29 +13,29 @@ interface RegionCampState {
 }
 
 export const useRegionCampStore = create<RegionCampState>((set, get) => ({
-  regionsWithCamp: [],
-  facilitiesByRegion: {},
+    regionsWithCamp: [],
+    facilitiesByRegion: {},
 
-  hasCamp: (regionId) => get().regionsWithCamp.includes(regionId),
+    hasCamp: (regionId) => get().regionsWithCamp.includes(regionId),
 
-  buildCamp: (regionId) =>
-    set((state) =>
-      state.regionsWithCamp.includes(regionId)
-        ? state
-        : { regionsWithCamp: [...state.regionsWithCamp, regionId] }
-    ),
+    buildCamp: (regionId) =>
+        set((state) =>
+            state.regionsWithCamp.includes(regionId)
+                ? state
+                : { regionsWithCamp: [...state.regionsWithCamp, regionId] }
+        ),
 
-  getFacilities: (regionId) => get().facilitiesByRegion[regionId] ?? [],
+    getFacilities: (regionId) => get().facilitiesByRegion[regionId] ?? [],
 
-  installFacility: (regionId, facility) =>
-    set((state) => {
-      const current = state.facilitiesByRegion[regionId] ?? []
-      if (current.includes(facility)) return state
-      return {
-        facilitiesByRegion: {
-          ...state.facilitiesByRegion,
-          [regionId]: [...current, facility],
-        },
-      }
-    }),
-}))
+    installFacility: (regionId, facility) =>
+        set((state) => {
+            const current = state.facilitiesByRegion[regionId] ?? [];
+            if (current.includes(facility)) return state;
+            return {
+                facilitiesByRegion: {
+                    ...state.facilitiesByRegion,
+                    [regionId]: [...current, facility],
+                },
+            };
+        }),
+}));
