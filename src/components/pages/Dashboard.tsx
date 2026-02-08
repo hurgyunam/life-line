@@ -4,6 +4,7 @@ import type { Survivor } from '@/types/survivor';
 import { SurvivorList } from '@/components/survivor/SurvivorList';
 import { RegionList } from '@/components/region/RegionList';
 import { GuidelinesList } from '@/components/guidelines/GuidelinesList';
+import { TechTree } from '@/components/tech/TechTree';
 import { TimeController } from '@/components/layout/TimeController';
 
 interface DashboardTile {
@@ -250,6 +251,8 @@ export function Dashboard({ survivors }: DashboardProps) {
     const popupContent =
     popupPage === 'survivors' ? (
         <SurvivorList survivors={survivors} />
+    ) : popupPage === 'research' ? (
+        <TechTree />
     ) : popupPage === 'regions' ? (
         <RegionList />
     ) : popupPage === 'guidelines' ? (
@@ -292,7 +295,7 @@ export function Dashboard({ survivors }: DashboardProps) {
                     aria-modal="true"
                     aria-labelledby="popup-title"
                 >
-                    <div className="flex flex-col w-full max-w-[428px] min-h-screen md:min-h-[calc(100dvh-2rem)] bg-white md:shadow-xl md:rounded-2xl overflow-hidden">
+                    <div className="flex flex-col w-full max-w-[428px] h-screen max-h-[100dvh] md:h-[calc(100dvh-2rem)] md:max-h-[calc(100dvh-2rem)] bg-white md:shadow-xl md:rounded-2xl overflow-hidden">
                         <header className="shrink-0 flex items-center justify-between gap-4 border-b border-gray-200 px-4 py-3">
                             <h2 id="popup-title" className="text-lg font-semibold text-gray-800">
                                 {t(popupTitleKey)}

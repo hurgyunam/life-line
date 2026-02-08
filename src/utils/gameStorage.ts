@@ -4,6 +4,7 @@ import { useActivityStore, syncNextActivityId, syncNextReservedId, type PendingA
 import { useRegionCampStore } from '@/stores/regionCampStore';
 import { useGameTimeStore } from '@/stores/gameTimeStore';
 import { useCampResourceStore, type CampResourceQuantities } from '@/stores/campResourceStore';
+import { useTechStore } from '@/stores/techStore';
 import type { Survivor } from '@/types/survivor';
 import type { Facility } from '@/types/facility';
 import { CAMP_RESOURCES_INITIAL } from '@/constants/gameConfig';
@@ -110,6 +111,10 @@ export interface SaveSlot {
   campResourceData?: {
     quantities: CampResourceQuantities
   }
+  /** 테크 해금 상태 */
+  techData?: {
+    completedTechIds: string[]
+  }
 }
 
 interface StorageData {
@@ -198,6 +203,9 @@ export function createSave(name?: string): SaveSlot {
         campResourceData: {
             quantities: { ...campResourceState.quantities },
         },
+        techData: {
+            completedTechIds: [...useTechStore.getState().completedTechIds],
+        },
     };
 
     const data = getStorageData();
@@ -281,6 +289,10 @@ export function loadSave(saveId: string): boolean {
         });
     }
 
+    if (slot.techData?.completedTechIds && Array.isArray(slot.techData.completedTechIds)) {
+        useTechStore.getState().setCompletedTechIds(slot.techData.completedTechIds);
+    }
+
     data.lastLoadedId = saveId;
     setStorageData(data);
     return true;
@@ -345,6 +357,9 @@ export function overwriteSave(saveId: string): boolean {
     };
     slot.campResourceData = {
         quantities: { ...campResourceState.quantities },
+    };
+    slot.techData = {
+        completedTechIds: [...useTechStore.getState().completedTechIds],
     };
 
     setStorageData(data);
