@@ -105,7 +105,9 @@
     "searchFood": "Search for food",
     "searchWater": "Search for water",
     "searchSurvivor": "Search for survivor",
-    "doResearch": "Research"
+    "doResearch": "Research",
+    "restWithSleepingBag": "Sleep in sleeping bag",
+    "restAtPlace": "Rest at place"
   },
   "status": {
     "hungry": "Hungry",

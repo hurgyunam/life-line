@@ -44,7 +44,7 @@ export function SleepingBagSelectModal({
         <div className="space-y-2 max-h-[60vh] overflow-y-auto">
           {SLEEPING_BAGS.map((sleepingBag) => {
             const stock = sleepingBagStocks[sleepingBag]
-            const tirednessGain = SURVIVOR_BALANCE.SLEEPING_BAG_TIREDNESS_GAIN[sleepingBag]
+            const tirednessGain = SURVIVOR_BALANCE.SLEEPING_BAG_TIREDNESS_GAIN_PER_HOUR[sleepingBag]
             const isSelected = sleepingBag === currentSleepingBag
 
             return (

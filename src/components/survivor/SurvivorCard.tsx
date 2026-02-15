@@ -43,15 +43,18 @@ export function SurvivorCard({ survivor }: SurvivorCardProps) {
     })
   )
 
-  const isSearchingFood = pendingActivities.some(
-    (a) => a.survivorId === survivor.id && a.type === 'searchFood'
-  )
-  const displayAction = isSearchingFood ? t('action.searching_food') : t('action.waiting')
+  const thisSurvivorPending = pendingActivities.find((a) => a.survivorId === survivor.id)
+  const isSearchingFood = thisSurvivorPending?.type === 'searchFood'
+  const isResting = thisSurvivorPending?.type === 'restWithSleepingBag' || thisSurvivorPending?.type === 'restAtPlace'
+  const displayAction = isSearchingFood
+    ? t('action.searching_food')
+    : isResting
+      ? thisSurvivorPending?.type === 'restWithSleepingBag'
+        ? t('action.sleeping')
+        : t('action.resting')
+      : t('action.waiting')
 
   const thisSurvivorReservations = reservedActivities.filter((a) => a.survivorId === survivor.id)
-  const thisSurvivorPending = pendingActivities.find(
-    (a) => a.survivorId === survivor.id && a.type === 'searchFood'
-  )
 
   const handleAddReservation = (type: ReservedActivityType) => {
     addReservedActivity(survivor.id, type)
@@ -104,7 +107,11 @@ export function SurvivorCard({ survivor }: SurvivorCardProps) {
               {thisSurvivorPending && (
                 <div className="mb-2 flex items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-indigo-800 font-medium">{t('reservedActivity.searchFood')}</span>
+                    <span className="text-indigo-800 font-medium">
+                      {thisSurvivorPending.type === 'searchFood' && t('reservedActivity.searchFood')}
+                      {thisSurvivorPending.type === 'restWithSleepingBag' && t('reservedActivity.restWithSleepingBag')}
+                      {thisSurvivorPending.type === 'restAtPlace' && t('reservedActivity.restAtPlace')}
+                    </span>
                     <span className="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium bg-indigo-200 text-indigo-800">
                       {t('survivorDetail.inProgress')}
                     </span>
