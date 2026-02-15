@@ -138,7 +138,31 @@
         "inProgress": "In Progress",
         "reserved": "Scheduled",
         "noInProgress": "No activities in progress.",
-        "empty": "No activities in progress or scheduled."
+        "empty": "No activity entries yet.",
+        "line": "Year {{year}} {{hour}}:{{minute}} {{name}} {{action}}",
+        "started": {
+            "eatWildStrawberry": "started eating wild strawberry",
+            "drinkWater": "started drinking water",
+            "searchFood": "started searching for food",
+            "searchWater": "started searching for water",
+            "searchSurvivor": "started searching for survivor",
+            "doResearch": "started research",
+            "restWithSleepingBag": "started sleeping in sleeping bag",
+            "restAtPlace": "started resting"
+        },
+        "filterSurvivor": "Survivor",
+        "filterType": "Activity type",
+        "filterAll": "All",
+        "prevPage": "Previous",
+        "nextPage": "Next",
+        "pageInfo": "Page {{current}} / {{total}}",
+        "noMatches": "No matching entries.",
+        "reason": {
+            "hungerThreshold": "hunger was at or below {{hungerThreshold}}",
+            "thirstThreshold": "thirst was at or below {{thirstThreshold}}",
+            "tirednessThreshold": "tiredness was at or below {{tirednessThreshold}}",
+            "boredomThreshold": "boredom was at or below {{boredomThreshold}}"
+        }
     },
     "dashboard": {
         "stats": "Stats",

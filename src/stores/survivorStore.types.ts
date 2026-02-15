@@ -43,12 +43,27 @@ export interface ReservedActivity {
     id: string;
     survivorId: string;
     type: ReservedActivityType;
+    /** 지침에 의해 자동 추가된 경우 해당 지침 키 (활동 로그에 이유 표시용) */
+    guidelineKey?: string;
+    /** 예약한 순간의 지침 값 (로그에 바꾸기 전 정보로 남기기 위함) */
+    reasonParams?: Record<string, string | number>;
 }
 
 /** 생존자별 첫 번째 예약 활동의 시작 시각 */
 export interface ActivityStartRecord {
     activityId: string;
     startedAt: GameTimePoint;
+}
+
+/** 활동 로그 한 줄 (개척왕 N년 HH시 MM분 이름이 OOO을 시작함) */
+export interface ActivityLogEntry {
+    at: GameTimePoint;
+    survivorId: string;
+    type: ReservedActivityType;
+    /** 행동을 한 이유 (지침 키). 표시 시 activityLog.reason[reasonKey] 사용 */
+    reasonKey?: string;
+    /** 이유 문구에 넣을 값 (threshold, foodResource, restPlace 등) */
+    reasonParams?: Record<string, string | number>;
 }
 
 // ─── survivorStore (욕구만) ────────────────────────────────────────────────────
@@ -77,6 +92,7 @@ export interface SurvivorState {
 export interface ActivityState {
     pendingActivities: PendingActivity[];
     reservedActivities: ReservedActivity[];
+    activityLogEntries: ActivityLogEntry[];
     activityStartTimes: Record<string, ActivityStartRecord>;
     guidelineSatisfyingPhase: Record<string, string | null>;
     discoveredSurvivorCount: number;
@@ -101,4 +117,5 @@ export interface ActivityState {
     insertGuidelineActivitiesIfNeeded: () => void;
     processReservedActivities: () => void;
     addPendingActivity: (activity: PendingActivity) => void;
+    addActivityLogEntry: (entry: ActivityLogEntry) => void;
 }
