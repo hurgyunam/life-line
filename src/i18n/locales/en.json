@@ -90,10 +90,30 @@
     "languageEn": "English",
     "sound": "Sound",
     "notifications": "Notifications",
-    "about": "About"
+    "about": "About",
+    "aboutTitle": "About",
+    "aboutAppName": "Life Line",
+    "aboutVersion": "Version {{version}}",
+    "aboutLicenses": "Open Source Licenses",
+    "aboutLucide": "Icons: Lucide (lucide.dev) · ISC/MIT License · © Cole Bemis, Lucide Contributors"
   },
   "common": {
     "cancel": "Cancel",
     "close": "Close"
+  },
+  "campResources": {
+    "construction": "Construction/Crafting",
+    "consumable": "Consumables",
+    "water": "Water",
+    "food": "Food",
+    "wood": "Wood",
+    "stone": "Stone",
+    "ironOre": "Iron Ore",
+    "cotton": "Cotton",
+    "leather": "Leather",
+    "wildStrawberry": "Wild Strawberry",
+    "potato": "Potato",
+    "corn": "Corn",
+    "wheat": "Wheat"
   }
 }

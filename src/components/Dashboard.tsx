@@ -249,41 +249,43 @@ export function Dashboard({ survivors }: DashboardProps) {
         ))}
       </div>
 
-      {/* 페이지 팝업 */}
+      {/* 페이지 팝업 - 모바일 UI 레이아웃 유지 (PC에서는 max-w-[428px] 프레임 내 표시) */}
       {popupPage && (
         <div
-          className="fixed inset-0 z-50 flex flex-col bg-white"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 md:p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="popup-title"
         >
-          <header className="shrink-0 flex items-center justify-between gap-4 border-b border-gray-200 px-4 py-3">
-            <h2 id="popup-title" className="text-lg font-semibold text-gray-800">
-              {t(popupTitleKey)}
-            </h2>
-            <button
-              type="button"
-              onClick={() => setPopupPage(null)}
-              className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-              aria-label={t('common.close')}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          <div className="flex flex-col w-full max-w-[428px] min-h-screen md:min-h-[calc(100dvh-2rem)] bg-white md:shadow-xl md:rounded-2xl overflow-hidden">
+            <header className="shrink-0 flex items-center justify-between gap-4 border-b border-gray-200 px-4 py-3">
+              <h2 id="popup-title" className="text-lg font-semibold text-gray-800">
+                {t(popupTitleKey)}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setPopupPage(null)}
+                className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+                aria-label={t('common.close')}
               >
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
-            </button>
-          </header>
-          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4">{popupContent}</div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            </header>
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4">{popupContent}</div>
+          </div>
         </div>
       )}
     </div>
