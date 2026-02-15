@@ -3,7 +3,7 @@ import type { Facility } from '@/types/facility'
 
 interface RegionCampState {
   /** 캠프가 건설된 지역 ID 목록 */
-  regionsWithCamp: Set<string>
+  regionsWithCamp: string[]
   /** 지역별 설치된 시설 목록 */
   facilitiesByRegion: Record<string, Facility[]>
   hasCamp: (regionId: string) => boolean
@@ -13,15 +13,17 @@ interface RegionCampState {
 }
 
 export const useRegionCampStore = create<RegionCampState>((set, get) => ({
-  regionsWithCamp: new Set(),
+  regionsWithCamp: [],
   facilitiesByRegion: {},
 
-  hasCamp: (regionId) => get().regionsWithCamp.has(regionId),
+  hasCamp: (regionId) => get().regionsWithCamp.includes(regionId),
 
   buildCamp: (regionId) =>
-    set((state) => ({
-      regionsWithCamp: new Set([...state.regionsWithCamp, regionId]),
-    })),
+    set((state) =>
+      state.regionsWithCamp.includes(regionId)
+        ? state
+        : { regionsWithCamp: [...state.regionsWithCamp, regionId] }
+    ),
 
   getFacilities: (regionId) => get().facilitiesByRegion[regionId] ?? [],
 

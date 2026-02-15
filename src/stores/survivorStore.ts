@@ -84,6 +84,15 @@ function genActivityId() {
   return `activity-${nextActivityId++}`
 }
 
+/** 로드된 pendingActivities 기준으로 nextActivityId 동기화 (gameStorage에서 사용) */
+export function syncNextActivityId(activities: PendingActivity[]) {
+  const max = activities.reduce((acc, a) => {
+    const n = parseInt(a.id.replace('activity-', ''), 10)
+    return isNaN(n) ? acc : Math.max(acc, n)
+  }, 0)
+  nextActivityId = max + 1
+}
+
 export const useSurvivorStore = create<SurvivorState>((set, get) => ({
   survivors: initialSurvivors,
   pendingActivities: [],

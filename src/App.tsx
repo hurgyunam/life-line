@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BottomNav, type NavPage } from '@/components/layout/BottomNav'
+import { loadLastSave } from '@/utils/gameStorage'
 import { GameHeader } from '@/components/layout/GameHeader'
 import { Dashboard } from '@/components/pages/Dashboard'
 import { Settings } from '@/components/pages/Settings'
@@ -19,6 +20,10 @@ const pageKeys: Record<NavPage, string> = {
 function App() {
   const { t, i18n } = useTranslation()
   const [currentPage, setCurrentPage] = useState<NavPage>('dashboard')
+
+  useEffect(() => {
+    loadLastSave()
+  }, [])
 
   useEffect(() => {
     document.documentElement.lang = i18n.language

@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '@/i18n'
+import {
+  createSave,
+  loadSave,
+  deleteSave,
+  getSaveList,
+  type SaveSlot,
+} from '@/utils/gameStorage'
 
 const languageLabels: Record<SupportedLanguage, string> = {
   ko: 'settings.languageKo',
@@ -89,6 +96,25 @@ function InfoIcon({ className }: { className?: string }) {
   )
 }
 
+function SaveIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+      <polyline points="17 21 17 13 7 13 7 21" />
+      <polyline points="7 3 7 8 15 8" />
+    </svg>
+  )
+}
+
 function PlaceholderIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -120,10 +146,45 @@ const THIRD_PARTY_LICENSES: Array<{ name: string; license: string; copyright: st
   { name: 'TypeScript', license: 'Apache-2.0', copyright: '© Microsoft Corporation' },
 ]
 
+function formatSaveDate(createdAt: number): string {
+  const d = new Date(createdAt)
+  return d.toLocaleString(undefined, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export function Settings() {
   const { t, i18n } = useTranslation()
   const [showLanguageModal, setShowLanguageModal] = useState(false)
   const [showAboutModal, setShowAboutModal] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [saveList, setSaveList] = useState<SaveSlot[]>([])
+
+  const refreshSaveList = () => setSaveList(getSaveList())
+
+  const openSaveModal = () => {
+    refreshSaveList()
+    setShowSaveModal(true)
+  }
+
+  const handleCreateSave = () => {
+    createSave()
+    refreshSaveList()
+  }
+
+  const handleLoadSave = (id: string) => {
+    loadSave(id)
+    setShowSaveModal(false)
+  }
+
+  const handleDeleteSave = (id: string) => {
+    deleteSave(id)
+    refreshSaveList()
+  }
 
   const handleLanguageChange = (lng: SupportedLanguage) => {
     i18n.changeLanguage(lng)
@@ -132,6 +193,12 @@ export function Settings() {
   }
 
   const tiles: SettingTile[] = [
+    {
+      id: 'save',
+      icon: <SaveIcon className="h-8 w-8" />,
+      labelKey: 'settings.saveManagement',
+      onClick: openSaveModal,
+    },
     {
       id: 'language',
       icon: <GlobeIcon className="h-8 w-8" />,
@@ -228,6 +295,85 @@ export function Settings() {
             >
               {t('common.cancel')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* 세이브 관리 모달 */}
+      {showSaveModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowSaveModal(false)}
+        >
+          <div
+            className="w-full max-w-sm max-h-[85vh] overflow-hidden flex flex-col rounded-2xl bg-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="shrink-0 p-4 pb-2 text-lg font-semibold text-gray-800">
+              {t('settings.saveManagement')}
+            </h3>
+            <div className="flex-1 min-h-0 overflow-y-auto px-4">
+              <button
+                type="button"
+                onClick={handleCreateSave}
+                className="mb-4 w-full rounded-xl bg-indigo-600 py-3 text-sm font-medium text-white hover:bg-indigo-700"
+              >
+                {t('settings.saveNew')}
+              </button>
+              {saveList.length === 0 ? (
+                <p className="py-8 text-center text-sm text-gray-500">
+                  {t('settings.saveEmpty')}
+                </p>
+              ) : (
+                <ul className="space-y-2 pb-4">
+                  {saveList.map((slot) => (
+                    <li
+                      key={slot.id}
+                      className="flex items-center justify-between gap-2 rounded-xl bg-gray-50 p-3"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-gray-800">
+                          {slot.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formatSaveDate(slot.createdAt)} ·{' '}
+                          {t('settings.saveSurvivors', {
+                            count: Array.isArray(slot.survivorData.survivors)
+                              ? slot.survivorData.survivors.length
+                              : 0,
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleLoadSave(slot.id)}
+                          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700"
+                        >
+                          {t('settings.saveLoad')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSave(slot.id)}
+                          className="rounded-lg bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-200"
+                        >
+                          {t('settings.saveDelete')}
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="shrink-0 border-t border-gray-100 p-4">
+              <button
+                type="button"
+                onClick={() => setShowSaveModal(false)}
+                className="w-full rounded-xl bg-gray-200 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-300"
+              >
+                {t('common.close')}
+              </button>
+            </div>
           </div>
         </div>
       )}
