@@ -1,20 +1,27 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BottomNav, type NavPage } from '@/components/BottomNav'
 import { GameHeader } from '@/components/GameHeader'
+import { Settings } from '@/components/Settings'
 import { SurvivorList } from '@/components/SurvivorList'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
 
-const pageTitles: Record<NavPage, string> = {
-  survivors: '생존자 리스트',
-  research: '연구 트리',
-  dashboard: '대시보드',
-  regions: '지역 리스트',
-  settings: '설정',
+const pageKeys: Record<NavPage, string> = {
+  survivors: 'page.survivors',
+  research: 'page.research',
+  dashboard: 'page.dashboard',
+  regions: 'page.regions',
+  settings: 'page.settings',
 }
 
 function App() {
+  const { t, i18n } = useTranslation()
   const [currentPage, setCurrentPage] = useState<NavPage>('survivors')
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language
+  }, [i18n.language])
   const survivors = useSurvivorStore((state) => state.survivors)
   const year = useGameTimeStore((state) => state.year)
   const hour = useGameTimeStore((state) => state.hour)
@@ -32,16 +39,17 @@ function App() {
         <GameHeader />
         <header className="shrink-0 p-4 pb-2">
           <h1 className="text-2xl font-bold text-gray-800">
-            {pageTitles[currentPage]}
+            {t(pageKeys[currentPage])}
           </h1>
         </header>
         <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-24">
           {currentPage === 'survivors' && (
             <SurvivorList survivors={survivors} />
           )}
-          {currentPage !== 'survivors' && (
+          {currentPage === 'settings' && <Settings />}
+          {currentPage !== 'survivors' && currentPage !== 'settings' && (
             <div className="flex items-center justify-center min-h-[200px]">
-              <p className="text-gray-500">준비 중입니다.</p>
+              <p className="text-gray-500">{t('page.comingSoon')}</p>
             </div>
           )}
         </div>

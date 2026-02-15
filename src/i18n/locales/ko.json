@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "survivors": "생존자",
+    "research": "연구",
+    "dashboard": "대시보드",
+    "regions": "지역",
+    "settings": "설정"
+  },
+  "page": {
+    "survivors": "생존자 리스트",
+    "research": "연구 트리",
+    "dashboard": "대시보드",
+    "regions": "지역 리스트",
+    "settings": "설정",
+    "comingSoon": "준비 중입니다."
+  },
+  "gameHeader": {
+    "timeFormat": "개척왕 {{year}}년 {{hour}}시 {{minute}}분",
+    "pause": "일시정지",
+    "speed": "{{multiplier}}배속"
+  },
+  "survivorList": {
+    "name": "이름",
+    "age": "나이",
+    "status": "상태",
+    "currentAction": "현재 행동",
+    "detailExpand": "상세 펼치기",
+    "detailCollapse": "상세 접기",
+    "ageSuffix": "세",
+    "searchingFood": "음식 찾아보기"
+  },
+  "survivorDetail": {
+    "name": "이름",
+    "age": "나이",
+    "status": "상태",
+    "currentAction": "현재 행동",
+    "inventory": "개인 소지품",
+    "carrotCount": "당근 {{count}}개",
+    "waterCount": "식수 {{count}}개",
+    "eatCarrot": "당근 먹기",
+    "drinkWater": "식수 마시기",
+    "activities": "활동",
+    "searchFood": "음식 찾아보기 ({{hours}}시간)",
+    "searchWater": "식수 찾아보기 ({{hours}}시간)",
+    "searchSurvivor": "또 다른 생존자 찾아보기 ({{hours}}시간)",
+    "doResearch": "연구하기",
+    "inProgress": "진행 중",
+    "hoursRequired": "{{hours}}시간 소요",
+    "statusIndicators": "상태 지수",
+    "hunger": "배고픔",
+    "tiredness": "피곤함",
+    "thirst": "목마름",
+    "boredom": "지루함"
+  },
+  "status": {
+    "hungry": "굶주림",
+    "bored": "지루함",
+    "tired": "피로",
+    "stressed": "스트레스",
+    "healthy": "건강함",
+    "satisfied": "만족"
+  },
+  "action": {
+    "farming_carrots": "당근 농사 진행중",
+    "mining_stones": "광산에서 돌 캐는 중",
+    "chopping_wood": "나무 베는 중",
+    "resting": "휴식 중",
+    "cooking": "요리 중",
+    "sleeping": "수면 중",
+    "researching": "연구 중",
+    "waiting": "대기 중",
+    "searching_food": "음식 찾아보기"
+  },
+  "settings": {
+    "title": "설정",
+    "language": "언어",
+    "languageKo": "한국어",
+    "languageEn": "English"
+  }
+}
