@@ -56,7 +56,7 @@
         "moveDown": "Move Down"
     },
     "gameHeader": {
-        "timeFormat": "Pioneer Year {{year}}, {{hour}}:{{minute}}",
+        "timeFormat": "Pioneer Year {{year}}, {{month}}/{{day}} {{hour}}:{{minute}}",
         "pause": "Pause",
         "speed": "{{multiplier}}x"
     },
@@ -141,7 +141,7 @@
         "reserved": "Scheduled",
         "noInProgress": "No activities in progress.",
         "empty": "No activity entries yet.",
-        "line": "Year {{year}} {{hour}}:{{minute}} {{name}} {{action}}",
+        "line": "Year {{year}} {{month}}/{{day}} {{hour}}:{{minute}} {{name}} {{action}}",
         "started": {
             "eatWildStrawberry": "started eating wild strawberry",
             "drinkWater": "started drinking water",

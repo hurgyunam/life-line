@@ -26,6 +26,8 @@ function LogLine({
         <p className="text-sm text-gray-700 py-0.5">
             {t('activityLog.line', {
                 year: at.year,
+                month: at.month,
+                day: at.day,
                 hour: at.hour,
                 minute: at.minute,
                 name: survivorName,
@@ -160,7 +162,7 @@ export function ActivityLog() {
                 <ul className="space-y-0">
                     {pageEntries.map((entry, index) => (
                         <li
-                            key={`${entry.at.year}-${entry.at.hour}-${entry.at.minute}-${entry.survivorId}-${index}`}
+                            key={`${entry.at.year}-${entry.at.month}-${entry.at.day}-${entry.at.hour}-${entry.at.minute}-${entry.survivorId}-${index}`}
                         >
                             <LogLine
                                 entry={entry}

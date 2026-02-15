@@ -70,9 +70,11 @@ export function SurvivorCard({ survivor }: SurvivorCardProps) {
     );
 
     const year = useGameTimeStore((s) => s.year);
+    const month = useGameTimeStore((s) => s.month);
+    const day = useGameTimeStore((s) => s.day);
     const hour = useGameTimeStore((s) => s.hour);
     const minute = useGameTimeStore((s) => s.minute);
-    const now = { year, hour, minute };
+    const now = { year, month, day, hour, minute };
 
     const thisSurvivorPending = pendingActivities.find(
         (a) => a.survivorId === survivor.id,

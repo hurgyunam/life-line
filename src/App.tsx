@@ -37,15 +37,29 @@ function App() {
     }, [i18n.language]);
     const survivors = useSurvivorStore((state) => state.survivors);
     const year = useGameTimeStore((state) => state.year);
+    const month = useGameTimeStore((state) => state.month);
+    const day = useGameTimeStore((state) => state.day);
     const hour = useGameTimeStore((state) => state.hour);
     const minute = useGameTimeStore((state) => state.minute);
-    const completeDueActivities = useActivityStore((state) => state.completeDueActivities);
-    const processReservedActivities = useActivityStore((state) => state.processReservedActivities);
+    const completeDueActivities = useActivityStore(
+        (state) => state.completeDueActivities,
+    );
+    const processReservedActivities = useActivityStore(
+        (state) => state.processReservedActivities,
+    );
 
     useEffect(() => {
-        completeDueActivities({ year, hour, minute });
+        completeDueActivities({ year, month, day, hour, minute });
         processReservedActivities();
-    }, [year, hour, minute, completeDueActivities, processReservedActivities]);
+    }, [
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        completeDueActivities,
+        processReservedActivities,
+    ]);
 
     // 자동 저장: 주기(분)마다 현재 세이브 덮어쓰기
     const lastSaveRef = useRef(Date.now());
@@ -78,17 +92,24 @@ function App() {
                     </h1>
                 </header>
                 <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-[calc(57px+0.5rem+max(1rem,env(safe-area-inset-bottom))+0.5rem)]">
-                    {currentPage === 'dashboard' && <Dashboard survivors={survivors} />}
+                    {currentPage === 'dashboard' && (
+                        <Dashboard survivors={survivors} />
+                    )}
                     {currentPage === 'settings' && <Settings />}
                     {currentPage === 'campResources' && <CampResources />}
                     {currentPage === 'quest' && (
                         <div className="flex items-center justify-center min-h-[200px]">
-                            <p className="text-gray-500">{t('page.comingSoon')}</p>
+                            <p className="text-gray-500">
+                                {t('page.comingSoon')}
+                            </p>
                         </div>
                     )}
                     {currentPage === 'activityLog' && <ActivityLog />}
                 </div>
-                <BottomNav currentPage={currentPage} onNavigate={setCurrentPage} />
+                <BottomNav
+                    currentPage={currentPage}
+                    onNavigate={setCurrentPage}
+                />
             </main>
         </div>
     );

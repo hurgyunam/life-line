@@ -33,7 +33,15 @@ import type { ConsumableResource } from '@/types/resource';
 function startConsumableActivity(
     consumableKey: ConsumableResource,
     survivorId: string,
-    now: { year: number; hour: number; minute: number } | undefined,
+    now:
+        | {
+              year: number;
+              month: number;
+              day: number;
+              hour: number;
+              minute: number;
+          }
+        | undefined,
 ): boolean {
     if (!now) return false;
     if (useCampResourceStore.getState().getQuantity(consumableKey) <= 0)

@@ -4,34 +4,58 @@
 
 import { GAME_TIME_CONFIG } from '@/constants/gameConfig';
 
-/** 게임 시각 (진행 중 활동 완료 시점 비교용) */
+const MINUTES_PER_DAY =
+    GAME_TIME_CONFIG.HOURS_PER_DAY * GAME_TIME_CONFIG.MINUTES_PER_HOUR;
+const DAYS_PER_YEAR =
+    GAME_TIME_CONFIG.MONTHS_PER_YEAR * GAME_TIME_CONFIG.DAYS_PER_MONTH;
+
+/** 게임 시각 (년/월/일/시/분). 월·일은 1부터 시작 */
 export interface GameTimePoint {
-  year: number
-  hour: number
-  minute: number
+    year: number;
+    month: number;
+    day: number;
+    hour: number;
+    minute: number;
 }
 
+/** 기준 시각(1년 1월 1일 0시 0분)부터의 경과 분 */
 export function toMinutes(t: GameTimePoint): number {
+    const days =
+        (t.year - 1) * DAYS_PER_YEAR +
+        (t.month - 1) * GAME_TIME_CONFIG.DAYS_PER_MONTH +
+        (t.day - 1);
     return (
-        t.year * GAME_TIME_CONFIG.HOURS_PER_DAY * GAME_TIME_CONFIG.MINUTES_PER_HOUR +
-    t.hour * GAME_TIME_CONFIG.MINUTES_PER_HOUR +
-    t.minute
+        days * MINUTES_PER_DAY +
+        t.hour * GAME_TIME_CONFIG.MINUTES_PER_HOUR +
+        t.minute
     );
 }
 
-export function addMinutesToPoint(t: GameTimePoint, minutes: number): GameTimePoint {
-    let m = t.minute + minutes;
-    let h = t.hour;
-    let y = t.year;
-    if (m >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
-        h += Math.floor(m / GAME_TIME_CONFIG.MINUTES_PER_HOUR);
-        m = m % GAME_TIME_CONFIG.MINUTES_PER_HOUR;
-    }
-    if (h >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
-        y += Math.floor(h / GAME_TIME_CONFIG.HOURS_PER_DAY);
-        h = h % GAME_TIME_CONFIG.HOURS_PER_DAY;
-    }
-    return { year: y, hour: h, minute: m };
+/** 경과 분을 GameTimePoint로 변환 */
+export function minutesToPoint(totalMinutes: number): GameTimePoint {
+    let rest = Math.max(0, Math.floor(totalMinutes));
+    const minute = rest % GAME_TIME_CONFIG.MINUTES_PER_HOUR;
+    rest = Math.floor(rest / GAME_TIME_CONFIG.MINUTES_PER_HOUR);
+    const hour = rest % GAME_TIME_CONFIG.HOURS_PER_DAY;
+    rest = Math.floor(rest / GAME_TIME_CONFIG.HOURS_PER_DAY);
+    const day0 = rest % GAME_TIME_CONFIG.DAYS_PER_MONTH;
+    rest = Math.floor(rest / GAME_TIME_CONFIG.DAYS_PER_MONTH);
+    const month0 = rest % GAME_TIME_CONFIG.MONTHS_PER_YEAR;
+    rest = Math.floor(rest / GAME_TIME_CONFIG.MONTHS_PER_YEAR);
+    return {
+        year: rest + 1,
+        month: month0 + 1,
+        day: day0 + 1,
+        hour,
+        minute,
+    };
+}
+
+export function addMinutesToPoint(
+    t: GameTimePoint,
+    minutes: number,
+): GameTimePoint {
+    return minutesToPoint(toMinutes(t) + minutes);
 }
 
 export function randomInRange(min: number, max: number): number {

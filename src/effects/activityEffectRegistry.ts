@@ -9,25 +9,30 @@
  * - 결합도를 낮추고 테스트 시 mock 주입 가능
  */
 
-import type { ReservedActivityType } from '@/stores/survivorStore.types';
+import type {
+    ReservedActivityType,
+    GameTimePoint,
+} from '@/stores/survivorStore.types';
 
 /** 활동 실행 이펙트 payload */
 export type ActivityEffectPayload = {
-  type: ReservedActivityType
-  survivorId: string
-  /** restWithSleepingBag, restAtPlace에서 필요 */
-  now?: { year: number; hour: number; minute: number }
-}
+    type: ReservedActivityType;
+    survivorId: string;
+    /** restWithSleepingBag, restAtPlace에서 필요 */
+    now?: GameTimePoint;
+};
 
 /** 생존자 스탯 업데이트 이펙트 (completeDueActivities 등에서 사용) */
 export type UpdateSurvivorStatPayload = {
-  survivorId: string
-  stat: 'tiredness' | 'boredom'
-  value: number
-}
+    survivorId: string;
+    stat: 'tiredness' | 'boredom';
+    value: number;
+};
 
-export type ActivityEffectHandler = (payload: ActivityEffectPayload) => boolean
-export type UpdateSurvivorStatHandler = (payload: UpdateSurvivorStatPayload) => void
+export type ActivityEffectHandler = (payload: ActivityEffectPayload) => boolean;
+export type UpdateSurvivorStatHandler = (
+    payload: UpdateSurvivorStatPayload,
+) => void;
 
 const activityHandlers = new Map<ReservedActivityType, ActivityEffectHandler>();
 let updateSurvivorStatHandler: UpdateSurvivorStatHandler | null = null;
@@ -35,13 +40,15 @@ let updateSurvivorStatHandler: UpdateSurvivorStatHandler | null = null;
 /** 활동 타입별 이펙트 핸들러 등록 */
 export function registerActivityEffect(
     type: ReservedActivityType,
-    handler: ActivityEffectHandler
+    handler: ActivityEffectHandler,
 ): void {
     activityHandlers.set(type, handler);
 }
 
 /** 생존자 스탯 업데이트 핸들러 등록 (completeDueActivities용) */
-export function registerUpdateSurvivorStat(handler: UpdateSurvivorStatHandler): void {
+export function registerUpdateSurvivorStat(
+    handler: UpdateSurvivorStatHandler,
+): void {
     updateSurvivorStatHandler = handler;
 }
 
@@ -53,6 +60,8 @@ export function runActivityEffect(payload: ActivityEffectPayload): boolean {
 }
 
 /** 생존자 스탯 업데이트 실행 */
-export function runUpdateSurvivorStat(payload: UpdateSurvivorStatPayload): void {
+export function runUpdateSurvivorStat(
+    payload: UpdateSurvivorStatPayload,
+): void {
     updateSurvivorStatHandler?.(payload);
 }

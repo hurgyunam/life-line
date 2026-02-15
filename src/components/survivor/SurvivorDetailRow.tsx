@@ -7,26 +7,7 @@ import { GaugeBar } from '@/components/ui/GaugeBar';
 import { statusColors } from '@/components/survivor/SurvivorList';
 import { GAME_TIME_CONFIG, ACTIVITY_BALANCE } from '@/constants/gameConfig';
 import { getConsumableActionKey } from '@/logic/consumeResourceHelpers';
-
-function addMinutesToTime(
-    year: number,
-    hour: number,
-    minute: number,
-    add: number,
-): { year: number; hour: number; minute: number } {
-    let m = minute + add;
-    let h = hour;
-    let y = year;
-    if (m >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
-        h += Math.floor(m / GAME_TIME_CONFIG.MINUTES_PER_HOUR);
-        m = m % GAME_TIME_CONFIG.MINUTES_PER_HOUR;
-    }
-    if (h >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
-        y += Math.floor(h / GAME_TIME_CONFIG.HOURS_PER_DAY);
-        h = h % GAME_TIME_CONFIG.HOURS_PER_DAY;
-    }
-    return { year: y, hour: h, minute: m };
-}
+import { addMinutesToPoint } from '@/logic/survivorStoreUtils';
 
 interface SurvivorDetailRowProps {
     survivor: Survivor;
@@ -39,11 +20,14 @@ export function SurvivorDetailRow({
 }: SurvivorDetailRowProps) {
     const { t } = useTranslation();
     const year = useGameTimeStore((state) => state.year);
+    const month = useGameTimeStore((state) => state.month);
+    const day = useGameTimeStore((state) => state.day);
     const hour = useGameTimeStore((state) => state.hour);
     const minute = useGameTimeStore((state) => state.minute);
     const advanceByMinutes = useGameTimeStore(
         (state) => state.advanceByMinutes,
     );
+    const now = { year, month, day, hour, minute };
 
     const wildStrawberry = useCampResourceStore((s) =>
         s.getQuantity('wildStrawberry'),
@@ -164,10 +148,8 @@ export function SurvivorDetailRow({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    const endAt = addMinutesToTime(
-                                        year,
-                                        hour,
-                                        minute,
+                                    const endAt = addMinutesToPoint(
+                                        now,
                                         ACTIVITY_BALANCE.FOOD_SEARCH
                                             .DURATION_HOURS *
                                             GAME_TIME_CONFIG.MINUTES_PER_HOUR,

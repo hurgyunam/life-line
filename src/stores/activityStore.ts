@@ -333,8 +333,8 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         const reserved = state.reservedActivities.find((a) => a.id === id);
         if (!reserved) return false;
 
-        const { year, hour, minute } = useGameTimeStore.getState();
-        const now = { year, hour, minute };
+        const { year, month, day, hour, minute } = useGameTimeStore.getState();
+        const now = { year, month, day, hour, minute };
 
         const success = runActivityEffect({
             type: reserved.type,
@@ -497,8 +497,8 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         const busySurvivorIds = new Set(
             state.pendingActivities.map((a) => a.survivorId),
         );
-        const { year, hour, minute } = useGameTimeStore.getState();
-        const now: GameTimePoint = { year, hour, minute };
+        const { year, month, day, hour, minute } = useGameTimeStore.getState();
+        const now: GameTimePoint = { year, month, day, hour, minute };
         const nowM = toMinutes(now);
         const survivorIds = [
             ...new Set(state.reservedActivities.map((a) => a.survivorId)),

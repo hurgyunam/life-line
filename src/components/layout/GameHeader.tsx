@@ -9,17 +9,30 @@ const TICK_INTERVAL_MS = 100;
 
 export function GameHeader() {
     const { t } = useTranslation();
-    const { year, hour, minute, isPaused, speed, setPaused, setSpeed } =
-    useGameTimeStore();
+    const {
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        isPaused,
+        speed,
+        setPaused,
+        setSpeed,
+    } = useGameTimeStore();
 
     useEffect(() => {
         const id = setInterval(() => {
             const gameState = useGameTimeStore.getState();
             useGameTimeStore.getState().tick();
             if (!gameState.isPaused) {
-                const gameMinutes = gameState.speed * GAME_TIME_CONFIG.MINUTES_PER_TICK_BASE;
-                const pendingActivities = useActivityStore.getState().pendingActivities;
-                useSurvivorStore.getState().decayByMinutes(gameMinutes, pendingActivities);
+                const gameMinutes =
+                    gameState.speed * GAME_TIME_CONFIG.MINUTES_PER_TICK_BASE;
+                const pendingActivities =
+                    useActivityStore.getState().pendingActivities;
+                useSurvivorStore
+                    .getState()
+                    .decayByMinutes(gameMinutes, pendingActivities);
             }
         }, TICK_INTERVAL_MS);
         return () => clearInterval(id);
@@ -27,6 +40,8 @@ export function GameHeader() {
 
     const timeLabel = t('gameHeader.timeFormat', {
         year,
+        month,
+        day,
         hour: String(hour).padStart(2, '0'),
         minute: String(minute).padStart(2, '0'),
     });

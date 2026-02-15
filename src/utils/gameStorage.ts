@@ -139,6 +139,8 @@ export interface SaveSlot {
     /** 구버전 세이브 호환용 optional */
     gameTimeData?: {
         year: number;
+        month?: number;
+        day?: number;
         hour: number;
         minute: number;
         isPaused: boolean;
@@ -179,6 +181,29 @@ function setStorageData(data: StorageData): void {
 
 function generateId(): string {
     return `save-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/** 구버전 GameTimePoint(year/hour/minute만 있음)를 년/월/일/시/분 형식으로 정규화 */
+function normalizeGameTimePoint(p: {
+    year?: number;
+    month?: number;
+    day?: number;
+    hour?: number;
+    minute?: number;
+}): {
+    year: number;
+    month: number;
+    day: number;
+    hour: number;
+    minute: number;
+} {
+    return {
+        year: p.year ?? 1,
+        month: p.month ?? 1,
+        day: p.day ?? 1,
+        hour: p.hour ?? 0,
+        minute: p.minute ?? 0,
+    };
 }
 
 function formatSaveDate(createdAt: number): string {
@@ -234,6 +259,8 @@ export function createSave(name?: string): SaveSlot {
         },
         gameTimeData: {
             year: gameTimeState.year,
+            month: gameTimeState.month,
+            day: gameTimeState.day,
             hour: gameTimeState.hour,
             minute: gameTimeState.minute,
             isPaused: gameTimeState.isPaused,
@@ -299,14 +326,24 @@ export function loadSave(saveId: string): boolean {
         : [];
     const pendingActivities: PendingActivity[] = rawPending.map(
         (a: PendingActivity & { type?: string; consumableKey?: string }) => {
-            if ((a as { type?: string }).type === 'eatWildStrawberry') {
-                return {
-                    ...a,
-                    type: 'consumeResource' as const,
-                    consumableKey: 'wildStrawberry' as const,
-                };
-            }
-            return a as PendingActivity;
+            const base =
+                (a as { type?: string }).type === 'eatWildStrawberry'
+                    ? {
+                          ...a,
+                          type: 'consumeResource' as const,
+                          consumableKey: 'wildStrawberry' as const,
+                      }
+                    : (a as PendingActivity);
+            return {
+                ...base,
+                endAt: normalizeGameTimePoint(
+                    (base as PendingActivity).endAt ?? {
+                        year: 1,
+                        hour: 0,
+                        minute: 0,
+                    },
+                ),
+            };
         },
     );
     const reservedActivities: ReservedActivity[] = Array.isArray(
@@ -347,6 +384,8 @@ export function loadSave(saveId: string): boolean {
     if (gameTimeData && typeof gameTimeData === 'object') {
         useGameTimeStore.setState({
             year: gameTimeData.year ?? 1,
+            month: gameTimeData.month ?? 1,
+            day: gameTimeData.day ?? 1,
             hour: gameTimeData.hour ?? 8,
             minute: gameTimeData.minute ?? 0,
             isPaused: gameTimeData.isPaused ?? true,
@@ -432,6 +471,8 @@ export function overwriteSave(saveId: string): boolean {
     };
     slot.gameTimeData = {
         year: gameTimeState.year,
+        month: gameTimeState.month,
+        day: gameTimeState.day,
         hour: gameTimeState.hour,
         minute: gameTimeState.minute,
         isPaused: gameTimeState.isPaused,

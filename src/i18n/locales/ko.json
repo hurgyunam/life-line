@@ -56,7 +56,7 @@
         "moveDown": "아래로 이동"
     },
     "gameHeader": {
-        "timeFormat": "개척왕 {{year}}년 {{hour}}시 {{minute}}분",
+        "timeFormat": "개척왕 {{year}}년 {{month}}월 {{day}}일 {{hour}}시 {{minute}}분",
         "pause": "일시정지",
         "speed": "{{multiplier}}배속"
     },
@@ -141,7 +141,7 @@
         "reserved": "예약됨",
         "noInProgress": "진행 중인 활동이 없습니다.",
         "empty": "아직 기록된 활동이 없습니다.",
-        "line": "개척왕 {{year}}년 {{hour}}시 {{minute}}분 {{name}}이(가) {{action}}",
+        "line": "개척왕 {{year}}년 {{month}}월 {{day}}일 {{hour}}시 {{minute}}분 {{name}}이(가) {{action}}",
         "started": {
             "eatWildStrawberry": "야생 딸기 먹기를 시작함",
             "drinkWater": "식수 마시기를 시작함",

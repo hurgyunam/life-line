@@ -8,6 +8,8 @@ import type { ConsumableResource } from '@/types/resource';
 export const GAME_TIME_CONFIG = {
     MINUTES_PER_HOUR: 60,
     HOURS_PER_DAY: 24,
+    DAYS_PER_MONTH: 30,
+    MONTHS_PER_YEAR: 12,
     MINUTES_PER_TICK_BASE: 6, // 1x 배속 기준 한 틱(100ms)당 지나는 게임 분
 } as const;
 
