@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-export type NavPage = 'survivors' | 'research' | 'dashboard' | 'regions' | 'settings'
+export type NavPage = 'quest' | 'campResources' | 'dashboard' | 'settings' | 'activityLog'
 
 interface BottomNavProps {
   currentPage: NavPage
@@ -8,38 +8,31 @@ interface BottomNavProps {
 }
 
 const navKeys: Record<NavPage, string> = {
-  survivors: 'nav.survivors',
-  research: 'nav.research',
+  quest: 'nav.quest',
+  campResources: 'nav.campResources',
   dashboard: 'nav.dashboard',
-  regions: 'nav.regions',
   settings: 'nav.settings',
+  activityLog: 'nav.activityLog',
 }
 
 const navItems: { page: NavPage; icon: React.ReactNode }[] = [
   {
-    page: 'survivors',
+    page: 'quest',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        <path d="M9 11l3 3L22 4" />
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
       </svg>
     ),
   },
   {
-    page: 'research',
+    page: 'campResources',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2v4" />
-        <path d="m4.93 4.93 2.83 2.83" />
-        <path d="M2 12h4" />
-        <path d="m4.93 19.07 2.83-2.83" />
-        <path d="M12 18v4" />
-        <path d="m17.24 17.24 2.83-2.83" />
-        <path d="M18 12h4" />
-        <path d="m19.07 4.93-2.83 2.83" />
-        <path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4Z" />
+        <path d="m7.5 4.27 9 5.15" />
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+        <path d="m3.3 7 8.7 5 8.7-5" />
+        <path d="M12 22V12" />
       </svg>
     ),
   },
@@ -55,12 +48,11 @@ const navItems: { page: NavPage; icon: React.ReactNode }[] = [
     ),
   },
   {
-    page: 'regions',
+    page: 'activityLog',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-        <line x1="9" x2="9" y1="3" y2="18" />
-        <line x1="15" x2="15" y1="6" y2="21" />
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
       </svg>
     ),
   },
@@ -79,38 +71,31 @@ export function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
   const { t } = useTranslation()
   return (
     <nav className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <div className="flex items-center justify-around h-[57px] px-2">
+      <div className="grid grid-cols-5 h-[57px] px-1">
         {navItems.map((item) => {
           const isCenter = item.page === 'dashboard'
           const isActive = currentPage === item.page
-
-          if (isCenter) {
-            return (
-              <button
-                key={item.page}
-                onClick={() => onNavigate(item.page)}
-                className="flex items-center justify-center w-[57px] h-[57px] shrink-0 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 active:scale-95 transition-all"
-                aria-label={t(navKeys[item.page])}
-              >
-                <span className="[&>svg]:w-6 [&>svg]:h-6">
-                  {item.icon}
-                </span>
-              </button>
-            )
-          }
 
           return (
             <button
               key={item.page}
               onClick={() => onNavigate(item.page)}
-              className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-colors ${
-                isActive ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700'
-              }`}
+              className={
+                isCenter
+                  ? 'flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 active:scale-95 transition-all w-[48px] h-[48px] justify-self-center'
+                  : `flex flex-col items-center justify-center gap-0.5 min-w-0 py-2 transition-colors ${
+                      isActive ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700'
+                    }`
+              }
               aria-label={t(navKeys[item.page])}
               aria-current={isActive ? 'page' : undefined}
             >
-              <span className="[&>svg]:w-6 [&>svg]:h-6">{item.icon}</span>
-              <span className="text-[10px] font-medium">{t(navKeys[item.page])}</span>
+              <span className="[&>svg]:w-6 [&>svg]:h-6 shrink-0">{item.icon}</span>
+              {!isCenter && (
+                <span className="text-[10px] font-medium truncate w-full text-center">
+                  {t(navKeys[item.page])}
+                </span>
+              )}
             </button>
           )
         })}

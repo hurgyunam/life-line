@@ -4,7 +4,10 @@
     "research": "연구",
     "dashboard": "대시보드",
     "regions": "지역",
-    "settings": "설정"
+    "settings": "설정",
+    "quest": "퀘스트",
+    "campResources": "캠프 자원",
+    "activityLog": "활동 로그"
   },
   "page": {
     "survivors": "생존자 리스트",
@@ -12,6 +15,9 @@
     "dashboard": "대시보드",
     "regions": "지역 리스트",
     "settings": "설정",
+    "quest": "퀘스트",
+    "campResources": "캠프 자원",
+    "activityLog": "활동 로그",
     "comingSoon": "준비 중입니다."
   },
   "gameHeader": {
@@ -71,6 +77,12 @@
     "waiting": "대기 중",
     "searching_food": "음식 찾아보기"
   },
+  "dashboard": {
+    "stats": "통계",
+    "resources": "자원",
+    "map": "지도",
+    "calendar": "캘린더"
+  },
   "settings": {
     "title": "설정",
     "language": "언어",
@@ -81,6 +93,7 @@
     "about": "정보"
   },
   "common": {
-    "cancel": "취소"
+    "cancel": "취소",
+    "close": "닫기"
   }
 }

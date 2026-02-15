@@ -4,7 +4,10 @@
     "research": "Research",
     "dashboard": "Dashboard",
     "regions": "Regions",
-    "settings": "Settings"
+    "settings": "Settings",
+    "quest": "Quest",
+    "campResources": "Camp Resources",
+    "activityLog": "Activity Log"
   },
   "page": {
     "survivors": "Survivor List",
@@ -12,6 +15,9 @@
     "dashboard": "Dashboard",
     "regions": "Region List",
     "settings": "Settings",
+    "quest": "Quest",
+    "campResources": "Camp Resources",
+    "activityLog": "Activity Log",
     "comingSoon": "Coming soon."
   },
   "gameHeader": {
@@ -71,6 +77,12 @@
     "waiting": "Waiting",
     "searching_food": "Searching for food"
   },
+  "dashboard": {
+    "stats": "Stats",
+    "resources": "Resources",
+    "map": "Map",
+    "calendar": "Calendar"
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",
@@ -81,6 +93,7 @@
     "about": "About"
   },
   "common": {
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "close": "Close"
   }
 }
