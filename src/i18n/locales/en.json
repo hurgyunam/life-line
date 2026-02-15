@@ -75,6 +75,12 @@
     "title": "Settings",
     "language": "Language",
     "languageKo": "한국어",
-    "languageEn": "English"
+    "languageEn": "English",
+    "sound": "Sound",
+    "notifications": "Notifications",
+    "about": "About"
+  },
+  "common": {
+    "cancel": "Cancel"
   }
 }

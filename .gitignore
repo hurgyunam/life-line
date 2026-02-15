@@ -1,2 +1,24 @@
+# Dependencies
 node_modules
+
+# Build output
+dist
+storybook-static
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
 *storybook.log
+
+# OS
+.DS_Store
+
+# Test coverage
+coverage

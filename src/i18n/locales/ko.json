@@ -75,6 +75,12 @@
     "title": "설정",
     "language": "언어",
     "languageKo": "한국어",
-    "languageEn": "English"
+    "languageEn": "English",
+    "sound": "소리",
+    "notifications": "알림",
+    "about": "정보"
+  },
+  "common": {
+    "cancel": "취소"
   }
 }
