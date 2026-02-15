@@ -82,6 +82,14 @@ export const SURVIVOR_BALANCE = {
     REST_PLACE_BOREDOM_GAIN_PER_HOUR: 20,
 } as const;
 
+/** 테크 트리 레이아웃 (절대 좌표 없이 계산용) */
+export const TECH_TREE_LAYOUT = {
+    NODE_WIDTH: 64,
+    NODE_HEIGHT: 64,
+    TIER_GAP: 48,
+    NODE_GAP: 24,
+} as const;
+
 /** 자동 저장 주기 옵션 (분 단위, 0 = 끄기) */
 export const AUTO_SAVE_INTERVAL_OPTIONS = [0, 1, 3, 5, 10] as const;
 export type AutoSaveIntervalMinutes = (typeof AUTO_SAVE_INTERVAL_OPTIONS)[number]
