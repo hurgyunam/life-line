@@ -9,7 +9,7 @@
  * - 결합도를 낮추고 테스트 시 mock 주입 가능
  */
 
-import type { ReservedActivityType } from '@/stores/survivorStore.types'
+import type { ReservedActivityType } from '@/stores/survivorStore.types';
 
 /** 활동 실행 이펙트 payload */
 export type ActivityEffectPayload = {
@@ -29,30 +29,30 @@ export type UpdateSurvivorStatPayload = {
 export type ActivityEffectHandler = (payload: ActivityEffectPayload) => boolean
 export type UpdateSurvivorStatHandler = (payload: UpdateSurvivorStatPayload) => void
 
-const activityHandlers = new Map<ReservedActivityType, ActivityEffectHandler>()
-let updateSurvivorStatHandler: UpdateSurvivorStatHandler | null = null
+const activityHandlers = new Map<ReservedActivityType, ActivityEffectHandler>();
+let updateSurvivorStatHandler: UpdateSurvivorStatHandler | null = null;
 
 /** 활동 타입별 이펙트 핸들러 등록 */
 export function registerActivityEffect(
-  type: ReservedActivityType,
-  handler: ActivityEffectHandler
+    type: ReservedActivityType,
+    handler: ActivityEffectHandler
 ): void {
-  activityHandlers.set(type, handler)
+    activityHandlers.set(type, handler);
 }
 
 /** 생존자 스탯 업데이트 핸들러 등록 (completeDueActivities용) */
 export function registerUpdateSurvivorStat(handler: UpdateSurvivorStatHandler): void {
-  updateSurvivorStatHandler = handler
+    updateSurvivorStatHandler = handler;
 }
 
 /** 활동 이펙트 실행 */
 export function runActivityEffect(payload: ActivityEffectPayload): boolean {
-  const handler = activityHandlers.get(payload.type)
-  if (!handler) return false
-  return handler(payload)
+    const handler = activityHandlers.get(payload.type);
+    if (!handler) return false;
+    return handler(payload);
 }
 
 /** 생존자 스탯 업데이트 실행 */
 export function runUpdateSurvivorStat(payload: UpdateSurvivorStatPayload): void {
-  updateSurvivorStatHandler?.(payload)
+    updateSurvivorStatHandler?.(payload);
 }

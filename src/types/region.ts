@@ -1,4 +1,4 @@
-import type { CampResource } from '@/types/resource'
+import type { CampResource } from '@/types/resource';
 
 /** 지역 - 자연 자원 분포 (양이 많을수록 해당 자원이 풍부함) */
 export interface Region {

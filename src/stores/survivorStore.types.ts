@@ -2,12 +2,12 @@
  * survivorStore / activityStore 타입 정의
  */
 
-import type { Survivor } from '@/types/survivor'
-import type { SleepingBag } from '@/types/sleepingBag'
-import type { RestPlace } from '@/types/restPlace'
-import type { GameTimePoint } from '@/logic/survivorStoreUtils'
+import type { Survivor } from '@/types/survivor';
+import type { SleepingBag } from '@/types/sleepingBag';
+import type { RestPlace } from '@/types/restPlace';
+import type { GameTimePoint } from '@/logic/survivorStoreUtils';
 
-export type { GameTimePoint }
+export type { GameTimePoint };
 
 /** 진행 중 활동 (시간이 지나면 완료 처리) */
 export interface PendingActivity {

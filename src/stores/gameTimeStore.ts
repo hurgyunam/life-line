@@ -1,5 +1,5 @@
-import { create } from 'zustand'
-import { GAME_TIME_CONFIG } from '@/constants/gameConfig'
+import { create } from 'zustand';
+import { GAME_TIME_CONFIG } from '@/constants/gameConfig';
 
 export type GameSpeed = 1 | 2 | 3
 
@@ -17,47 +17,47 @@ interface GameTimeState {
 }
 
 export const useGameTimeStore = create<GameTimeState>((set) => ({
-  year: 1,
-  hour: 8,
-  minute: 0,
-  isPaused: true,
-  speed: 1,
+    year: 1,
+    hour: 8,
+    minute: 0,
+    isPaused: true,
+    speed: 1,
 
-  setPaused: (paused) => set({ isPaused: paused }),
+    setPaused: (paused) => set({ isPaused: paused }),
 
-  setSpeed: (speed) => set({ speed, isPaused: false }),
+    setSpeed: (speed) => set({ speed, isPaused: false }),
 
-  tick: () =>
-    set((state) => {
-      if (state.isPaused) return state
-      const add = state.speed * GAME_TIME_CONFIG.MINUTES_PER_TICK_BASE
-      let minute = state.minute + add
-      let hour = state.hour
-      let year = state.year
-      if (minute >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
-        hour += Math.floor(minute / GAME_TIME_CONFIG.MINUTES_PER_HOUR)
-        minute = minute % GAME_TIME_CONFIG.MINUTES_PER_HOUR
-      }
-      if (hour >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
-        year += Math.floor(hour / GAME_TIME_CONFIG.HOURS_PER_DAY)
-        hour = hour % GAME_TIME_CONFIG.HOURS_PER_DAY
-      }
-      return { minute, hour, year }
-    }),
+    tick: () =>
+        set((state) => {
+            if (state.isPaused) return state;
+            const add = state.speed * GAME_TIME_CONFIG.MINUTES_PER_TICK_BASE;
+            let minute = state.minute + add;
+            let hour = state.hour;
+            let year = state.year;
+            if (minute >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
+                hour += Math.floor(minute / GAME_TIME_CONFIG.MINUTES_PER_HOUR);
+                minute = minute % GAME_TIME_CONFIG.MINUTES_PER_HOUR;
+            }
+            if (hour >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
+                year += Math.floor(hour / GAME_TIME_CONFIG.HOURS_PER_DAY);
+                hour = hour % GAME_TIME_CONFIG.HOURS_PER_DAY;
+            }
+            return { minute, hour, year };
+        }),
 
-  advanceByMinutes: (minutes) =>
-    set((state) => {
-      let minute = state.minute + minutes
-      let hour = state.hour
-      let year = state.year
-      if (minute >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
-        hour += Math.floor(minute / GAME_TIME_CONFIG.MINUTES_PER_HOUR)
-        minute = minute % GAME_TIME_CONFIG.MINUTES_PER_HOUR
-      }
-      if (hour >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
-        year += Math.floor(hour / GAME_TIME_CONFIG.HOURS_PER_DAY)
-        hour = hour % GAME_TIME_CONFIG.HOURS_PER_DAY
-      }
-      return { minute, hour, year }
-    }),
-}))
+    advanceByMinutes: (minutes) =>
+        set((state) => {
+            let minute = state.minute + minutes;
+            let hour = state.hour;
+            let year = state.year;
+            if (minute >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
+                hour += Math.floor(minute / GAME_TIME_CONFIG.MINUTES_PER_HOUR);
+                minute = minute % GAME_TIME_CONFIG.MINUTES_PER_HOUR;
+            }
+            if (hour >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
+                year += Math.floor(hour / GAME_TIME_CONFIG.HOURS_PER_DAY);
+                hour = hour % GAME_TIME_CONFIG.HOURS_PER_DAY;
+            }
+            return { minute, hour, year };
+        }),
+}));

@@ -19,4 +19,4 @@ export const QUEST_BALANCE = [
     {
 
     }
-]
+];
