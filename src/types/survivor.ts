@@ -18,14 +18,6 @@ export type SurvivorAction =
   | 'researching'
   | 'waiting'
 
-/** 개인 소지품 */
-export interface SurvivorInventory {
-  /** 야생 딸기 개수 */
-  wildStrawberry: number
-  /** 식수 개수 */
-  water: number
-}
-
 export interface Survivor {
   id: string
   name: string
@@ -40,6 +32,4 @@ export interface Survivor {
   thirst: number
   /** 지루함 (0=매우 지루함, 100=만족/재미있음) */
   boredom: number
-  /** 개인 소지품 */
-  inventory: SurvivorInventory
 }

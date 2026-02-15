@@ -17,8 +17,10 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useSurvivorStore } from '@/stores/survivorStore'
+import { useActivityStore } from '@/stores/activityStore'
+import { useCampResourceStore } from '@/stores/campResourceStore'
 import type { Survivor } from '@/types/survivor'
-import type { ReservedActivity, ReservedActivityType } from '@/stores/survivorStore'
+import type { ReservedActivity, ReservedActivityType } from '@/stores/survivorStore.types'
 import { GaugeBar } from '@/components/ui/GaugeBar'
 import { statusColors } from '@/components/survivor/SurvivorList'
 import { ACTIVITY_BALANCE } from '@/constants/gameConfig'
@@ -29,12 +31,14 @@ interface SurvivorCardProps {
 
 export function SurvivorCard({ survivor }: SurvivorCardProps) {
   const { t } = useTranslation()
-  const pendingActivities = useSurvivorStore((state) => state.pendingActivities)
-  const reservedActivities = useSurvivorStore((state) => state.reservedActivities)
-  const addReservedActivity = useSurvivorStore((state) => state.addReservedActivity)
-  const removeReservedActivity = useSurvivorStore((state) => state.removeReservedActivity)
-  const reorderReservedActivities = useSurvivorStore((state) => state.reorderReservedActivities)
-  const cancelPendingActivity = useSurvivorStore((state) => state.cancelPendingActivity)
+  const wildStrawberry = useCampResourceStore((s) => s.getQuantity('wildStrawberry'))
+  const water = useCampResourceStore((s) => s.getQuantity('water'))
+  const pendingActivities = useActivityStore((state) => state.pendingActivities)
+  const reservedActivities = useActivityStore((state) => state.reservedActivities)
+  const addReservedActivity = useActivityStore((state) => state.addReservedActivity)
+  const removeReservedActivity = useActivityStore((state) => state.removeReservedActivity)
+  const reorderReservedActivities = useActivityStore((state) => state.reorderReservedActivities)
+  const cancelPendingActivity = useActivityStore((state) => state.cancelPendingActivity)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -152,24 +156,24 @@ export function SurvivorCard({ survivor }: SurvivorCardProps) {
           )}
         </section>
 
-        {/* 소지품 + 예약 추가 버튼 */}
+        {/* 재고에서 바로 사용 + 예약 추가 버튼 */}
         <section>
-          <h4 className="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('survivorDetail.inventory')}</h4>
+          <h4 className="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('survivorDetail.stock')}</h4>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-gray-700">{t('survivorDetail.wildStrawberryCount', { count: survivor.inventory.wildStrawberry })}</span>
+            <span className="text-sm text-gray-700">{t('survivorDetail.wildStrawberryCount', { count: wildStrawberry })}</span>
             <button
               type="button"
               onClick={() => handleAddReservation('eatWildStrawberry')}
-              disabled={survivor.inventory.wildStrawberry <= 0}
+              disabled={wildStrawberry <= 0}
               className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
             >
               + {t('survivorDetail.eatWildStrawberry')}
             </button>
-            <span className="text-sm text-gray-700">{t('survivorDetail.waterCount', { count: survivor.inventory.water })}</span>
+            <span className="text-sm text-gray-700">{t('survivorDetail.waterCount', { count: water })}</span>
             <button
               type="button"
               onClick={() => handleAddReservation('drinkWater')}
-              disabled={survivor.inventory.water <= 0}
+              disabled={water <= 0}
               className="rounded-lg bg-sky-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
             >
               + {t('survivorDetail.drinkWater')}

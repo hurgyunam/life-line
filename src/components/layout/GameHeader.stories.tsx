@@ -4,16 +4,10 @@ import { GameHeader } from '@/components/layout/GameHeader'
 import { SurvivorList } from '@/components/survivor/SurvivorList'
 import { useSurvivorStore } from '@/stores/survivorStore'
 import type { Survivor } from '@/types/survivor'
-import { SURVIVOR_BALANCE } from '@/constants/gameConfig'
-
-const defaultInventory = {
-  wildStrawberry: SURVIVOR_BALANCE.INITIAL_INVENTORY.WILD_STRAWBERRY,
-  water: SURVIVOR_BALANCE.INITIAL_INVENTORY.WATER,
-}
 
 const initialSurvivors: Survivor[] = [
-  { id: '1', name: '김민수', age: 32, status: 'healthy', currentAction: 'farming_wildStrawberries', hunger: 90, tiredness: 85, thirst: 95, boredom: 80, inventory: { ...defaultInventory } },
-  { id: '2', name: '이서연', age: 28, status: 'healthy', currentAction: 'mining_stones', hunger: 75, tiredness: 70, thirst: 80, boredom: 65, inventory: { ...defaultInventory } },
+  { id: '1', name: '김민수', age: 32, status: 'healthy', currentAction: 'farming_wildStrawberries', hunger: 90, tiredness: 85, thirst: 95, boredom: 80 },
+  { id: '2', name: '이서연', age: 28, status: 'healthy', currentAction: 'mining_stones', hunger: 75, tiredness: 70, thirst: 80, boredom: 65 },
 ]
 
 const meta = {
@@ -64,7 +58,7 @@ export const WithSurvivorListAndTimeDecay: Story = {
   render: function WithSurvivorListAndTimeDecayStory() {
     const survivors = useSurvivorStore((state) => state.survivors)
     useEffect(() => {
-      useSurvivorStore.setState({ survivors: initialSurvivors.map((s) => ({ ...s, inventory: { ...defaultInventory } })) })
+      useSurvivorStore.setState({ survivors: initialSurvivors })
     }, [])
     return (
       <>

@@ -5,10 +5,11 @@
 
 import type { Survivor } from '@/types/survivor'
 import type { GameSettings } from '@/utils/gameStorage'
-import type { ReservedActivityType } from '@/stores/survivorStore'
+import type { ReservedActivityType } from '@/stores/survivorStore.types'
 import type { FoodResource } from '@/types/resource'
 import type { RestPlace } from '@/types/restPlace'
 import { useRestPlaceStore } from '@/stores/restPlaceStore'
+import { useCampResourceStore } from '@/stores/campResourceStore'
 
 /** 행동 지침에서 파생되는 활동 타입 (일부는 기존 타입과 동일) */
 export type GuidelineActivityType =
@@ -63,7 +64,7 @@ function canExecuteGuideline(
       if (!inPhase && !atOrBelowThreshold) return noMatch('eatWildStrawberry')
       if (foodResource === 'wildStrawberry') {
         return {
-          canExecute: survivor.inventory.wildStrawberry > 0,
+          canExecute: useCampResourceStore.getState().getQuantity('wildStrawberry') > 0,
           activityType: 'eatWildStrawberry',
           shouldClearPhase: false,
         }
@@ -77,7 +78,7 @@ function canExecuteGuideline(
       const atOrBelowThreshold = survivor.thirst <= threshold
       if (!inPhase && !atOrBelowThreshold) return noMatch('drinkWater')
       return {
-        canExecute: survivor.inventory.water > 0,
+        canExecute: useCampResourceStore.getState().getQuantity('water') > 0,
         activityType: 'drinkWater',
         shouldClearPhase: false,
       }

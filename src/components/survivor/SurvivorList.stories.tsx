@@ -4,17 +4,11 @@ import { GameHeader } from '@/components/layout/GameHeader'
 import { SurvivorList } from '@/components/survivor/SurvivorList'
 import { useSurvivorStore } from '@/stores/survivorStore'
 import type { Survivor } from '@/types/survivor'
-import { SURVIVOR_BALANCE } from '@/constants/gameConfig'
-
-const defaultInventory = {
-  wildStrawberry: SURVIVOR_BALANCE.INITIAL_INVENTORY.WILD_STRAWBERRY,
-  water: SURVIVOR_BALANCE.INITIAL_INVENTORY.WATER,
-}
 
 const mockSurvivors: Survivor[] = [
-  { id: '1', name: '김민수', age: 32, status: 'healthy', currentAction: 'farming_wildStrawberries', hunger: 85, tiredness: 70, thirst: 90, boredom: 75, inventory: { ...defaultInventory } },
-  { id: '2', name: '이서연', age: 28, status: 'bored', currentAction: 'mining_stones', hunger: 60, tiredness: 55, thirst: 45, boredom: 30, inventory: { ...defaultInventory } },
-  { id: '3', name: '박준호', age: 45, status: 'hungry', currentAction: 'cooking', hunger: 20, tiredness: 65, thirst: 50, boredom: 65, inventory: { ...defaultInventory } },
+  { id: '1', name: '김민수', age: 32, status: 'healthy', currentAction: 'farming_wildStrawberries', hunger: 85, tiredness: 70, thirst: 90, boredom: 75 },
+  { id: '2', name: '이서연', age: 28, status: 'bored', currentAction: 'mining_stones', hunger: 60, tiredness: 55, thirst: 45, boredom: 30 },
+  { id: '3', name: '박준호', age: 45, status: 'hungry', currentAction: 'cooking', hunger: 20, tiredness: 65, thirst: 50, boredom: 65 },
 ]
 
 const meta = {
@@ -74,7 +68,7 @@ export const TimeDecaySimulation: Story = {
   render: function TimeDecaySimulationStory() {
     const survivors = useSurvivorStore((state) => state.survivors)
     useEffect(() => {
-      useSurvivorStore.setState({ survivors: mockSurvivors.map((s) => ({ ...s, inventory: { ...defaultInventory } })) })
+      useSurvivorStore.setState({ survivors: mockSurvivors })
     }, [])
     return (
       <>

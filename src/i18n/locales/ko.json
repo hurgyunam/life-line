@@ -76,7 +76,7 @@
     "age": "나이",
     "status": "상태",
     "currentAction": "현재 행동",
-    "inventory": "개인 소지품",
+    "stock": "재고",
     "wildStrawberryCount": "야생 딸기 {{count}}개",
     "waterCount": "식수 {{count}}개",
     "eatWildStrawberry": "야생 딸기 먹기",

@@ -57,8 +57,8 @@ export const SURVIVOR_BALANCE = {
     boredom: 0.06,
   },
 
-  // 초기 인벤토리
-  INITIAL_INVENTORY: {
+  /** 생존자 1명당 초기 재고 (캠프 재고 합산용) */
+  INITIAL_STOCK_PER_SURVIVOR: {
     WILD_STRAWBERRY: 10,
     WATER: 10,
   },
@@ -86,15 +86,16 @@ export const SURVIVOR_BALANCE = {
 export const AUTO_SAVE_INTERVAL_OPTIONS = [0, 1, 3, 5, 10] as const
 export type AutoSaveIntervalMinutes = (typeof AUTO_SAVE_INTERVAL_OPTIONS)[number]
 
-/** 캠프 자원 초기 수량 */
+/** 새 게임 시작 시 캠프 자원 초기 수량 (생존자들은 재고에서 바로 사용) */
+const INITIAL_SURVIVOR_COUNT = 8
 export const CAMP_RESOURCES_INITIAL: Record<CampResource, number> = {
   wood: 0,
   stone: 0,
   ironOre: 0,
   cotton: 0,
   leather: 0,
-  water: 0,
-  wildStrawberry: 0,
+  water: INITIAL_SURVIVOR_COUNT * SURVIVOR_BALANCE.INITIAL_STOCK_PER_SURVIVOR.WATER,
+  wildStrawberry: INITIAL_SURVIVOR_COUNT * SURVIVOR_BALANCE.INITIAL_STOCK_PER_SURVIVOR.WILD_STRAWBERRY,
   potato: 0,
   corn: 0,
   wheat: 0,
