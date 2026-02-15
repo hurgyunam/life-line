@@ -165,7 +165,8 @@
             "hungerThreshold": "satiety was at or below {{hungerThreshold}}",
             "thirstThreshold": "hydration was at or below {{thirstThreshold}}",
             "tirednessThreshold": "rest was at or below {{tirednessThreshold}}",
-            "boredomThreshold": "satisfaction was at or below {{boredomThreshold}}"
+            "boredomThreshold": "satisfaction was at or below {{boredomThreshold}}",
+            "survivalInstinct": "due to critical state (below 5%)"
         }
     },
     "dashboard": {

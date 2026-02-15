@@ -15,6 +15,7 @@ import {
     GUIDELINES_DEFAULT,
 } from '@/constants/gameConfig';
 import { getGuidelineActivityForSurvivor } from '@/logic/guidelineActivities';
+import { getSurvivalInstinctActivity } from '@/logic/survivalInstinct';
 import { getSettings } from '@/utils/gameStorage';
 import { useGameTimeStore } from '@/stores/gameTimeStore';
 import {
@@ -91,9 +92,51 @@ function buildReasonParams(
                     (v.waterStockThreshold as number) ??
                     GUIDELINES_DEFAULT.WATER_STOCK_THRESHOLD,
             };
+        case 'survivalInstinct':
+            return {};
         default:
             return undefined;
     }
+}
+
+/** 생존 본능: 상태 5% 미만인 생존자의 해당 채우기 활동을 예약 목록 맨 위로 올림 */
+function promoteSurvivalInstinctActivities(
+    reserved: ReservedActivity[],
+    survivors: Survivor[],
+): ReservedActivity[] {
+    const survivorIds = [
+        ...new Set(reserved.map((a) => a.survivorId)),
+    ] as string[];
+    const result: ReservedActivity[] = [];
+    for (const survivorId of survivorIds) {
+        const segment = reserved.filter((a) => a.survivorId === survivorId);
+        const survivor = survivors.find((s) => s.id === survivorId);
+        const instinct = survivor
+            ? getSurvivalInstinctActivity(survivor)
+            : null;
+        if (!instinct) {
+            result.push(...segment);
+            continue;
+        }
+        const idx = segment.findIndex((a) => a.type === instinct.type);
+        if (idx >= 0) {
+            const moved = segment[idx];
+            const rest = segment.filter((_, i) => i !== idx);
+            result.push(moved, ...rest);
+        } else {
+            result.push(
+                {
+                    id: genReservedId(),
+                    survivorId,
+                    type: instinct.type,
+                    guidelineKey: 'survivalInstinct',
+                    reasonParams: {},
+                },
+                ...segment,
+            );
+        }
+    }
+    return result;
 }
 
 export const useActivityStore = create<ActivityState>((set, get) => ({
@@ -423,8 +466,15 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
             processSurvivor(survivor);
         }
 
+        const afterInstinct = promoteSurvivalInstinctActivities(
+            newReserved,
+            survivors,
+        );
+        const idsBefore = state.reservedActivities.map((a) => a.id).join(',');
+        const idsAfter = afterInstinct.map((a) => a.id).join(',');
         const hasChanges =
-            newReserved.length !== state.reservedActivities.length ||
+            afterInstinct.length !== state.reservedActivities.length ||
+            idsBefore !== idsAfter ||
             Object.keys(phaseUpdates).some(
                 (id) =>
                     phaseUpdates[id] !==
@@ -432,7 +482,7 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
             );
         if (hasChanges) {
             set({
-                reservedActivities: newReserved,
+                reservedActivities: afterInstinct,
                 guidelineSatisfyingPhase: {
                     ...state.guidelineSatisfyingPhase,
                     ...phaseUpdates,

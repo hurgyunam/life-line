@@ -165,7 +165,8 @@
             "hungerThreshold": "포만도가 {{hungerThreshold}} 이하라서",
             "thirstThreshold": "수분이 {{thirstThreshold}} 이하라서",
             "tirednessThreshold": "휴식도가 {{tirednessThreshold}} 이하라서",
-            "boredomThreshold": "만족도가 {{boredomThreshold}} 이하라서"
+            "boredomThreshold": "만족도가 {{boredomThreshold}} 이하라서",
+            "survivalInstinct": "상태가 위험 수준(5% 미만)이라서"
         }
     },
     "dashboard": {

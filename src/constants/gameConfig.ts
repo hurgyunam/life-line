@@ -111,6 +111,9 @@ export const TECH_TREE_LAYOUT = {
     NODE_GAP: 24,
 } as const;
 
+/** 생존 본능: 이 퍼센트 미만이면 해당 상태를 채우는 활동이 예약 목록 맨 위로 올라감 */
+export const SURVIVAL_INSTINCT_THRESHOLD = 5;
+
 /** 행동 지침 기본값 (기준치 등) */
 export const GUIDELINES_DEFAULT = {
     /** 야생 딸기 재고가 이 값 이하일 때 야생 딸기 채취 지침 발동 */
