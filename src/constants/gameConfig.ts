@@ -36,7 +36,15 @@ export const SURVIVOR_BALANCE = {
   // 아이템 사용 효과
   EAT_WILD_STRAWBERRY_HUNGER_GAIN: 15,
   DRINK_WATER_THIRST_GAIN: 15,
-  
+
+  /** 게임 분당 수치 감소량 (배속에 따라 비례 적용) */
+  DECAY_PER_GAME_MINUTE: {
+    hunger: 0.1,
+    tiredness: 0.08,
+    thirst: 0.12,
+    boredom: 0.06,
+  },
+
   // 초기 인벤토리
   INITIAL_INVENTORY: {
     WILD_STRAWBERRY: 10,
