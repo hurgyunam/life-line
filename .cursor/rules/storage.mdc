@@ -8,18 +8,23 @@ alwaysApply: false
 
 ## 저장 범위
 
-- **저장 대상**: `survivorStore`, `regionCampStore` (생존자·지역·시설 데이터)
-- **미저장**: `gameTimeStore`, `campResourceStore` — 저장 시 해당 Store를 추가할지 기획과 맞춰 결정
+- **저장 대상**: `survivorStore`, `regionCampStore`, `gameTimeStore`, `campResourceStore` (생존자·지역·시설·게임시간·캠프자원)
 
 ## localStorage 키 네이밍
 
-- 접두사 `life-line-` 사용 (예: `life-line-saves`)
+- 접두사 `life-line-` 사용 (예: `life-line-saves`, `life-line-settings`)
 - 키는 `src/utils/gameStorage.ts`에 상수로 정의
 
 ## 저장 로직 위치
 
 - 세이브/로드 로직은 `@/utils/gameStorage.ts`에 집중
 - Store는 persist 미들웨어 없이 순수 상태만 관리
+
+## 설정 저장 (life-line-settings)
+
+- **스키마**: `GameSettings` 인터페이스로 타입 정의, `SETTINGS_DEFAULTS`로 기본값 관리
+- **API**: `getSettings()`, `setSettings(partial)` — 일부만 수정 시 `Partial<GameSettings>` 병합
+- **마이그레이션**: 구버전 형식(autoSaveIntervalMinutes 단독 등)은 `migrateSettings()`에서 처리
 
 ## 저장 형식 변경 시 마이그레이션
 

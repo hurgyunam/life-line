@@ -1,9 +1,63 @@
+import i18n from '@/i18n'
 import { useSurvivorStore, syncNextActivityId, type PendingActivity } from '@/stores/survivorStore'
 import { useRegionCampStore } from '@/stores/regionCampStore'
+import { useGameTimeStore } from '@/stores/gameTimeStore'
+import { useCampResourceStore, type CampResourceQuantities } from '@/stores/campResourceStore'
 import type { Survivor } from '@/types/survivor'
 import type { Facility } from '@/types/facility'
+import { CAMP_RESOURCES_INITIAL } from '@/constants/gameConfig'
 
 const STORAGE_KEY = 'life-line-saves'
+const SETTINGS_KEY = 'life-line-settings'
+
+/** 게임 설정 스키마 */
+export interface GameSettings {
+  /** 자동 저장 주기(분). 0 = 끄기 */
+  autoSaveIntervalMinutes: number
+}
+
+const SETTINGS_DEFAULTS: GameSettings = {
+  autoSaveIntervalMinutes: 0,
+}
+
+function getSettingsRaw(): unknown {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+/** 구버전 형식(autoSaveIntervalMinutes 단독) 마이그레이션 */
+function migrateSettings(parsed: unknown): GameSettings {
+  const result = { ...SETTINGS_DEFAULTS }
+  if (parsed && typeof parsed === 'object') {
+    const obj = parsed as Record<string, unknown>
+    if (typeof obj.autoSaveIntervalMinutes === 'number') {
+      result.autoSaveIntervalMinutes = Math.max(0, obj.autoSaveIntervalMinutes)
+    }
+  }
+  return result
+}
+
+/** 설정 조회 (기본값 + 마이그레이션 적용) */
+export function getSettings(): GameSettings {
+  const parsed = getSettingsRaw()
+  return migrateSettings(parsed)
+}
+
+/** 설정 일부 저장 (병합) */
+export function setSettings(partial: Partial<GameSettings>): void {
+  try {
+    const current = getSettings()
+    const next = { ...current, ...partial }
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(next))
+  } catch {
+    // ignore
+  }
+}
 
 export interface SaveSlot {
   id: string
@@ -18,6 +72,18 @@ export interface SaveSlot {
   regionData: {
     regionsWithCamp: string[]
     facilitiesByRegion: Record<string, Facility[]>
+  }
+  /** 구버전 세이브 호환용 optional */
+  gameTimeData?: {
+    year: number
+    hour: number
+    minute: number
+    isPaused: boolean
+    speed: 1 | 2 | 3
+  }
+  /** 구버전 세이브 호환용 optional */
+  campResourceData?: {
+    quantities: CampResourceQuantities
   }
 }
 
@@ -48,7 +114,7 @@ function generateId(): string {
   return `save-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
-function formatSaveName(createdAt: number): string {
+function formatSaveDate(createdAt: number): string {
   const d = new Date(createdAt)
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -56,6 +122,14 @@ function formatSaveName(createdAt: number): string {
   const h = String(d.getHours()).padStart(2, '0')
   const min = String(d.getMinutes()).padStart(2, '0')
   return `${y}-${m}-${day} ${h}:${min}`
+}
+
+function formatManualSaveName(createdAt: number): string {
+  return i18n.t('settings.saveNameManual', { date: formatSaveDate(createdAt) })
+}
+
+function formatAutoSaveName(createdAt: number): string {
+  return i18n.t('settings.saveNameAuto', { date: formatSaveDate(createdAt) })
 }
 
 /** 세이브 슬롯 목록 조회 (최신순) */
@@ -68,12 +142,14 @@ export function getSaveList(): SaveSlot[] {
 export function createSave(name?: string): SaveSlot {
   const survivorState = useSurvivorStore.getState()
   const regionState = useRegionCampStore.getState()
+  const gameTimeState = useGameTimeStore.getState()
+  const campResourceState = useCampResourceStore.getState()
   const createdAt = Date.now()
   const id = generateId()
 
   const slot: SaveSlot = {
     id,
-    name: name ?? formatSaveName(createdAt),
+    name: name ?? formatManualSaveName(createdAt),
     createdAt,
     survivorData: {
       survivors: survivorState.survivors,
@@ -84,6 +160,16 @@ export function createSave(name?: string): SaveSlot {
     regionData: {
       regionsWithCamp: regionState.regionsWithCamp,
       facilitiesByRegion: regionState.facilitiesByRegion,
+    },
+    gameTimeData: {
+      year: gameTimeState.year,
+      hour: gameTimeState.hour,
+      minute: gameTimeState.minute,
+      isPaused: gameTimeState.isPaused,
+      speed: gameTimeState.speed,
+    },
+    campResourceData: {
+      quantities: { ...campResourceState.quantities },
     },
   }
 
@@ -99,7 +185,7 @@ export function loadSave(saveId: string): boolean {
   const slot = data.saves.find((s) => s.id === saveId)
   if (!slot) return false
 
-  const { survivorData, regionData } = slot
+  const { survivorData, regionData, gameTimeData, campResourceData } = slot
   const survivors = Array.isArray(survivorData.survivors) ? survivorData.survivors : useSurvivorStore.getState().survivors
   const pendingActivities: PendingActivity[] = Array.isArray(survivorData.pendingActivities)
     ? survivorData.pendingActivities
@@ -125,6 +211,22 @@ export function loadSave(saveId: string): boolean {
     facilitiesByRegion,
   })
 
+  if (gameTimeData && typeof gameTimeData === 'object') {
+    useGameTimeStore.setState({
+      year: gameTimeData.year ?? 1,
+      hour: gameTimeData.hour ?? 8,
+      minute: gameTimeData.minute ?? 0,
+      isPaused: gameTimeData.isPaused ?? true,
+      speed: gameTimeData.speed ?? 1,
+    })
+  }
+
+  if (campResourceData?.quantities && typeof campResourceData.quantities === 'object') {
+    useCampResourceStore.setState({
+      quantities: { ...CAMP_RESOURCES_INITIAL, ...campResourceData.quantities },
+    })
+  }
+
   data.lastLoadedId = saveId
   setStorageData(data)
   return true
@@ -148,3 +250,48 @@ export function loadLastSave(): boolean {
   }
   return false
 }
+
+/** 마지막 로드된 세이브 ID (자동 저장용) */
+export function getLastLoadedId(): string | null {
+  return getStorageData().lastLoadedId
+}
+
+/** 기존 세이브 슬롯 덮어쓰기 (자동 저장용) */
+export function overwriteSave(saveId: string): boolean {
+  const data = getStorageData()
+  const slot = data.saves.find((s) => s.id === saveId)
+  if (!slot) return false
+
+  const survivorState = useSurvivorStore.getState()
+  const regionState = useRegionCampStore.getState()
+  const gameTimeState = useGameTimeStore.getState()
+  const campResourceState = useCampResourceStore.getState()
+  const createdAt = Date.now()
+
+  slot.createdAt = createdAt
+  slot.name = formatAutoSaveName(createdAt)
+  slot.survivorData = {
+    survivors: survivorState.survivors,
+    pendingActivities: survivorState.pendingActivities,
+    discoveredSurvivorCount: survivorState.discoveredSurvivorCount,
+    researchProgress: survivorState.researchProgress,
+  }
+  slot.regionData = {
+    regionsWithCamp: regionState.regionsWithCamp,
+    facilitiesByRegion: regionState.facilitiesByRegion,
+  }
+  slot.gameTimeData = {
+    year: gameTimeState.year,
+    hour: gameTimeState.hour,
+    minute: gameTimeState.minute,
+    isPaused: gameTimeState.isPaused,
+    speed: gameTimeState.speed,
+  }
+  slot.campResourceData = {
+    quantities: { ...campResourceState.quantities },
+  }
+
+  setStorageData(data)
+  return true
+}
+

@@ -6,8 +6,11 @@ import {
   loadSave,
   deleteSave,
   getSaveList,
+  getSettings,
+  setSettings,
   type SaveSlot,
 } from '@/utils/gameStorage'
+import { AUTO_SAVE_INTERVAL_OPTIONS } from '@/constants/gameConfig'
 
 const languageLabels: Record<SupportedLanguage, string> = {
   ko: 'settings.languageKo',
@@ -115,6 +118,24 @@ function SaveIcon({ className }: { className?: string }) {
   )
 }
 
+function ClockIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  )
+}
+
 function PlaceholderIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -162,13 +183,28 @@ export function Settings() {
   const [showLanguageModal, setShowLanguageModal] = useState(false)
   const [showAboutModal, setShowAboutModal] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [showAutoSaveModal, setShowAutoSaveModal] = useState(false)
   const [saveList, setSaveList] = useState<SaveSlot[]>([])
+  const [autoSaveInterval, setAutoSaveIntervalState] = useState(
+    getSettings().autoSaveIntervalMinutes
+  )
 
   const refreshSaveList = () => setSaveList(getSaveList())
 
   const openSaveModal = () => {
     refreshSaveList()
     setShowSaveModal(true)
+  }
+
+  const openAutoSaveModal = () => {
+    setAutoSaveIntervalState(getSettings().autoSaveIntervalMinutes)
+    setShowAutoSaveModal(true)
+  }
+
+  const handleAutoSaveIntervalChange = (minutes: number) => {
+    setSettings({ autoSaveIntervalMinutes: minutes })
+    setAutoSaveIntervalState(minutes)
+    setShowAutoSaveModal(false)
   }
 
   const handleCreateSave = () => {
@@ -198,6 +234,12 @@ export function Settings() {
       icon: <SaveIcon className="h-8 w-8" />,
       labelKey: 'settings.saveManagement',
       onClick: openSaveModal,
+    },
+    {
+      id: 'autoSave',
+      icon: <ClockIcon className="h-8 w-8" />,
+      labelKey: 'settings.autoSaveInterval',
+      onClick: openAutoSaveModal,
     },
     {
       id: 'language',
@@ -258,6 +300,48 @@ export function Settings() {
           </button>
         ))}
       </div>
+
+      {/* 자동 저장 주기 모달 */}
+      {showAutoSaveModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShowAutoSaveModal(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mb-4 text-lg font-semibold text-gray-800">
+              {t('settings.autoSaveInterval')}
+            </h3>
+            <div className="flex flex-col gap-2">
+              {AUTO_SAVE_INTERVAL_OPTIONS.map((minutes) => (
+                <button
+                  key={minutes}
+                  type="button"
+                  onClick={() => handleAutoSaveIntervalChange(minutes)}
+                  className={`rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors ${
+                    autoSaveInterval === minutes
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {minutes === 0
+                    ? t('settings.autoSaveOff')
+                    : t('settings.autoSaveMinutes', { count: minutes })}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAutoSaveModal(false)}
+              className="mt-4 w-full rounded-xl bg-gray-200 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-300"
+            >
+              {t('common.cancel')}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 언어 선택 모달 */}
       {showLanguageModal && (
