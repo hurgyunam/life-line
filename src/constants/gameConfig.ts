@@ -3,6 +3,7 @@
  */
 
 import type { CampResource } from '@/types/resource';
+import type { ConsumableResource } from '@/types/resource';
 
 export const GAME_TIME_CONFIG = {
     MINUTES_PER_HOUR: 60,
@@ -44,6 +45,26 @@ export const ACTIVITY_BALANCE = {
     },
 } as const;
 
+/** 소비 활동(먹기/마시기) 소요 시간 및 효과 (추가 음식은 이 설정만으로 확장) */
+export const CONSUMABLE_ACTIVITIES = {
+    wildStrawberry: {
+        stat: 'hunger' as const,
+        gain: 15,
+        durationMinutes: 10,
+    },
+    water: {
+        stat: 'thirst' as const,
+        gain: 15,
+        durationMinutes: 10,
+    },
+    potato: { stat: 'hunger' as const, gain: 20, durationMinutes: 12 },
+    corn: { stat: 'hunger' as const, gain: 25, durationMinutes: 14 },
+    wheat: { stat: 'hunger' as const, gain: 30, durationMinutes: 16 },
+} satisfies Record<
+    ConsumableResource,
+    { stat: 'hunger' | 'thirst'; gain: number; durationMinutes: number }
+>;
+
 export const SURVIVOR_BALANCE = {
     // 아이템 사용 효과
     EAT_WILD_STRAWBERRY_HUNGER_GAIN: 15,
@@ -62,7 +83,7 @@ export const SURVIVOR_BALANCE = {
         WILD_STRAWBERRY: 10,
         WATER: 10,
     },
-  
+
     // 식량별 배고픔 회복량
     FOOD_HUNGER_GAIN: {
         wildStrawberry: 15,
@@ -70,7 +91,7 @@ export const SURVIVOR_BALANCE = {
         corn: 25,
         wheat: 30,
     },
-  
+
     /** 침낭별 시간당 피곤함 회복량 (1시간에 N 회복) */
     SLEEPING_BAG_TIREDNESS_GAIN_PER_HOUR: {
         sleepingBag1: 20,
@@ -92,7 +113,8 @@ export const TECH_TREE_LAYOUT = {
 
 /** 자동 저장 주기 옵션 (분 단위, 0 = 끄기) */
 export const AUTO_SAVE_INTERVAL_OPTIONS = [0, 1, 3, 5, 10] as const;
-export type AutoSaveIntervalMinutes = (typeof AUTO_SAVE_INTERVAL_OPTIONS)[number]
+export type AutoSaveIntervalMinutes =
+    (typeof AUTO_SAVE_INTERVAL_OPTIONS)[number];
 
 /** 새 게임 시작 시 캠프 자원 초기 수량 (생존자들은 재고에서 바로 사용) */
 const INITIAL_SURVIVOR_COUNT = 8;
@@ -102,8 +124,12 @@ export const CAMP_RESOURCES_INITIAL: Record<CampResource, number> = {
     ironOre: 0,
     cotton: 0,
     leather: 0,
-    water: INITIAL_SURVIVOR_COUNT * SURVIVOR_BALANCE.INITIAL_STOCK_PER_SURVIVOR.WATER,
-    wildStrawberry: INITIAL_SURVIVOR_COUNT * SURVIVOR_BALANCE.INITIAL_STOCK_PER_SURVIVOR.WILD_STRAWBERRY,
+    water:
+        INITIAL_SURVIVOR_COUNT *
+        SURVIVOR_BALANCE.INITIAL_STOCK_PER_SURVIVOR.WATER,
+    wildStrawberry:
+        INITIAL_SURVIVOR_COUNT *
+        SURVIVOR_BALANCE.INITIAL_STOCK_PER_SURVIVOR.WILD_STRAWBERRY,
     potato: 0,
     corn: 0,
     wheat: 0,
