@@ -1,0 +1,57 @@
+---
+description: 행동 지침(guideline) 추가·수정 시 수정할 파일과 패턴. Explore 없이 이 규칙만 따라 작업한다.
+alwaysApply: true
+---
+
+# 행동 지침(guideline) 추가/수정
+
+새로운 **기준치 이하일 때 OOO 활동** 지침을 추가할 때는 아래 파일들을 순서대로 수정한다. 각 파일에서 할 일만 보면 되고, 코드베이스 검색(Explore)은 하지 않는다.
+
+## 1. 기준치 상수 — `@/constants/gameConfig.ts`
+
+- `GUIDELINES_DEFAULT` 객체에 새 키 추가 (예: `WATER_STOCK_THRESHOLD: 30`).
+- 수치는 모두 여기서 관리하고, 다른 파일에서는 이 상수를 import해 사용한다.
+
+## 2. 설정 기본값·마이그레이션 — `@/utils/gameStorage.ts`
+
+- **SETTINGS_DEFAULTS.guidelinesValues**: 새 키 추가, 값은 `GUIDELINES_DEFAULT.XXX` 사용.
+- **SETTINGS_DEFAULTS.guidelinesOrder**: 배열에 새 지침 키 문자열을 원하는 순서로 추가.
+- **migrateSettings** 내 `if (Array.isArray(obj.guidelinesOrder))` 블록: 기존 저장 데이터에 새 키가 없으면 `guidelinesOrder`에 삽입하는 로직 추가 (예: `!next.includes('waterStockThreshold')`일 때 `next` 배열에 삽입).
+
+## 3. 지침 조건·활동 매핑 — `@/logic/guidelineActivities.ts`
+
+- **GuidelineActivityType** 타입: 새 활동 타입(예: `'searchWater'`) 추가. 이미 `ReservedActivityType`에 있으면 그 이름을 그대로 쓴다.
+- **canExecuteGuideline** switch: `case '새지침키':` 추가.  
+  - `values.새지침키`로 기준치 읽기, 기본값은 `GUIDELINES_DEFAULT.XXX`.  
+  - 조건 만족 시 `{ canExecute: true, activityType: 'ReservedActivityType이름', shouldClearPhase: false }` 반환.  
+  - 불만족 시 `noMatch('같은 activityType')` 반환.
+- **toReservedActivityType** switch: `case '해당 GuidelineActivityType': return 'ReservedActivityType';` 추가.
+- **getGuidelineActivityForSurvivor** 내 `order` 기본값 배열: `settings.guidelinesOrder ?? [...]`에 새 지침 키 추가.
+
+## 4. 활동 스토어·로그 이유 — `@/stores/activityStore.ts`
+
+- **buildReasonParams** switch: `case '새지침키':` 추가.  
+  - `return { 새지침키: (v.새지침키 as number) ?? GUIDELINES_DEFAULT.XXX };`  
+  - 활동 로그에 "이유"로 표시될 때 사용된다.
+- **insertGuidelineActivitiesIfNeeded** (선택):  
+  - 해당 활동이 **진행 중(Pending)**으로 존재하는 타입이면(예: `searchFood`는 `pendingActivities`에 있음), `hasPendingX(survivorId)` 같은 보조 함수를 만들고, `result.activity === '해당타입' && hasPendingX(survivor.id)`일 때 `return`으로 예약 추가를 스킵한다.  
+  - `searchWater`처럼 Pending이 없는 활동은 이 단계 생략.
+
+## 5. 행동 지침 UI — `@/components/guidelines/GuidelinesList.tsx`
+
+- **allGuidelineTemplates** (useMemo): 새 항목 추가.  
+  - `key`, `template: t('guidelines.templates.새지침키')`, 숫자만 쓰면 `numberVariableKey: '새지침키'`.  
+  - 음식/침낭/휴식장소 선택이 필요하면 기존 지침처럼 `foodVariableKey` 등 추가.
+- **guidelineTemplates** 계산 시 쓰는 기본 배열 (`settings.guidelinesOrder || [...]`): 새 지침 키 추가.
+- **handleDragEnd** 내 `currentOrder` 기본 배열: 동일하게 새 지침 키 추가.
+
+## 6. 다국어 — `@/i18n/locales/ko.json`, `@/i18n/locales/en.json`
+
+- **guidelines.templates.새지침키**: 지침 문구. 숫자 기준치면 `{{새지침키}}` 사용.
+- **activityLog.reason.새지침키**: 활동 로그에 표시할 이유 한 줄 (예: "식수가 {{waterStockThreshold}}개 이하라서").
+
+## 참고
+
+- **ReservedActivityType**·**PendingActivity.type** 정의: `@/stores/survivorStore.types.ts`.
+- 활동 로그 이유 표시: `@/components/pages/ActivityLog.tsx`에서 `reasonKey`·`reasonParams`로 `t('activityLog.reason.' + reasonKey, reasonParams)` 호출. 별도 수정 없이 i18n만 맞추면 된다.
+- 새 지침 추가 후 `yarn prettier --write`로 수정한 파일 포맷 실행 (프로젝트 규칙).

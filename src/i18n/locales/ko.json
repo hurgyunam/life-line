@@ -25,6 +25,8 @@
     "guidelines": {
         "list": ["배고픔이 30 이하면 야생딸기를 섭취한다."],
         "templates": {
+            "wildStrawberryStockThreshold": "야생 딸기 재고가 {{wildStrawberryStockThreshold}}개 이하일 경우 야생 딸기 채취를 한다.",
+            "waterStockThreshold": "식수가 {{waterStockThreshold}}개 이하일 때 식수를 구한다.",
             "hungerThreshold": "배고픔이 {{hungerThreshold}} 이하면 {{foodResource}}을(를) 섭취한다.",
             "tirednessThreshold": "피곤함이 {{tirednessThreshold}} 이하면 남는 {{sleepingBag}}에서 취침한다.",
             "thirstThreshold": "목마름이 {{thirstThreshold}} 이하일 경우 식수를 섭취한다.",
@@ -158,6 +160,8 @@
         "pageInfo": "{{current}} / {{total}} 페이지",
         "noMatches": "조건에 맞는 기록이 없습니다.",
         "reason": {
+            "wildStrawberryStockThreshold": "야생 딸기 재고가 {{wildStrawberryStockThreshold}}개 이하라서",
+            "waterStockThreshold": "식수가 {{waterStockThreshold}}개 이하라서",
             "hungerThreshold": "배고픔이 {{hungerThreshold}} 이하라서",
             "thirstThreshold": "목마름이 {{thirstThreshold}} 이하라서",
             "tirednessThreshold": "피곤함이 {{tirednessThreshold}} 이하라서",

@@ -10,12 +10,15 @@ import type { FoodResource } from '@/types/resource';
 import type { RestPlace } from '@/types/restPlace';
 import { useRestPlaceStore } from '@/stores/restPlaceStore';
 import { useCampResourceStore } from '@/stores/campResourceStore';
+import { GUIDELINES_DEFAULT } from '@/constants/gameConfig';
 
 /** 행동 지침에서 파생되는 활동 타입 (일부는 기존 타입과 동일) */
 export type GuidelineActivityType =
     | 'eatWildStrawberry'
     | 'eatFood' // potato, corn, wheat 등 (캠프 자원)
     | 'drinkWater'
+    | 'searchFood' // 야생 딸기 채취
+    | 'searchWater' // 식수 찾기
     | 'restWithSleepingBag'
     | 'restAtPlace';
 
@@ -55,6 +58,34 @@ function canExecuteGuideline(
     });
 
     switch (guidelineKey) {
+        case 'wildStrawberryStockThreshold': {
+            const threshold =
+                (values.wildStrawberryStockThreshold as number) ??
+                GUIDELINES_DEFAULT.WILD_STRAWBERRY_STOCK_THRESHOLD;
+            const stock = useCampResourceStore
+                .getState()
+                .getQuantity('wildStrawberry');
+            const atOrBelowThreshold = stock <= threshold;
+            if (!atOrBelowThreshold) return noMatch('searchFood');
+            return {
+                canExecute: true,
+                activityType: 'searchFood',
+                shouldClearPhase: false,
+            };
+        }
+        case 'waterStockThreshold': {
+            const threshold =
+                (values.waterStockThreshold as number) ??
+                GUIDELINES_DEFAULT.WATER_STOCK_THRESHOLD;
+            const stock = useCampResourceStore.getState().getQuantity('water');
+            const atOrBelowThreshold = stock <= threshold;
+            if (!atOrBelowThreshold) return noMatch('searchWater');
+            return {
+                canExecute: true,
+                activityType: 'searchWater',
+                shouldClearPhase: false,
+            };
+        }
         case 'hungerThreshold': {
             const threshold = (values.hungerThreshold as number) ?? 30;
             const foodResource =
@@ -141,6 +172,10 @@ export function toReservedActivityType(
             return null; // 아직 미구현
         case 'drinkWater':
             return 'drinkWater';
+        case 'searchFood':
+            return 'searchFood';
+        case 'searchWater':
+            return 'searchWater';
         case 'restWithSleepingBag':
             return 'restWithSleepingBag';
         case 'restAtPlace':
@@ -168,6 +203,8 @@ export function getGuidelineActivityForSurvivor(
     satisfyingPhase: string | null,
 ): GuidelineResult {
     const order = settings.guidelinesOrder ?? [
+        'wildStrawberryStockThreshold',
+        'waterStockThreshold',
         'hungerThreshold',
         'tirednessThreshold',
         'thirstThreshold',

@@ -16,7 +16,10 @@ import {
 import { useTechStore } from '@/stores/techStore';
 import type { Survivor } from '@/types/survivor';
 import type { Facility } from '@/types/facility';
-import { CAMP_RESOURCES_INITIAL } from '@/constants/gameConfig';
+import {
+    CAMP_RESOURCES_INITIAL,
+    GUIDELINES_DEFAULT,
+} from '@/constants/gameConfig';
 
 const STORAGE_KEY = 'life-line-saves';
 const SETTINGS_KEY = 'life-line-settings';
@@ -34,6 +37,9 @@ export interface GameSettings {
 const SETTINGS_DEFAULTS: GameSettings = {
     autoSaveIntervalMinutes: 0,
     guidelinesValues: {
+        wildStrawberryStockThreshold:
+            GUIDELINES_DEFAULT.WILD_STRAWBERRY_STOCK_THRESHOLD,
+        waterStockThreshold: GUIDELINES_DEFAULT.WATER_STOCK_THRESHOLD,
         hungerThreshold: 30,
         foodResource: 'wildStrawberry' as string, // 기본값은 야생딸기
         tirednessThreshold: 30,
@@ -43,6 +49,8 @@ const SETTINGS_DEFAULTS: GameSettings = {
         restPlace: 'bareGround' as string, // 기본값은 맨 땅
     },
     guidelinesOrder: [
+        'wildStrawberryStockThreshold',
+        'waterStockThreshold',
         'hungerThreshold',
         'tirednessThreshold',
         'thirstThreshold',
@@ -78,7 +86,19 @@ function migrateSettings(parsed: unknown): GameSettings {
             };
         }
         if (Array.isArray(obj.guidelinesOrder)) {
-            result.guidelinesOrder = obj.guidelinesOrder as string[];
+            const order = obj.guidelinesOrder as string[];
+            let next = order.includes('wildStrawberryStockThreshold')
+                ? order
+                : ['wildStrawberryStockThreshold', ...order];
+            if (!next.includes('waterStockThreshold')) {
+                const idx = next.indexOf('wildStrawberryStockThreshold');
+                next = [
+                    ...next.slice(0, idx + 1),
+                    'waterStockThreshold',
+                    ...next.slice(idx + 1),
+                ];
+            }
+            result.guidelinesOrder = next;
         }
     }
     return result;

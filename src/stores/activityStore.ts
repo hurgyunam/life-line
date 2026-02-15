@@ -12,6 +12,7 @@ import {
     GAME_TIME_CONFIG,
     ACTIVITY_BALANCE,
     CONSUMABLE_ACTIVITIES,
+    GUIDELINES_DEFAULT,
 } from '@/constants/gameConfig';
 import { getGuidelineActivityForSurvivor } from '@/logic/guidelineActivities';
 import { getSettings } from '@/utils/gameStorage';
@@ -77,6 +78,18 @@ function buildReasonParams(
             return {
                 boredomThreshold: (v.boredomThreshold as number) ?? 30,
                 restPlace: (v.restPlace as string) ?? 'bareGround',
+            };
+        case 'wildStrawberryStockThreshold':
+            return {
+                wildStrawberryStockThreshold:
+                    (v.wildStrawberryStockThreshold as number) ??
+                    GUIDELINES_DEFAULT.WILD_STRAWBERRY_STOCK_THRESHOLD,
+            };
+        case 'waterStockThreshold':
+            return {
+                waterStockThreshold:
+                    (v.waterStockThreshold as number) ??
+                    GUIDELINES_DEFAULT.WATER_STOCK_THRESHOLD,
             };
         default:
             return undefined;
@@ -351,6 +364,11 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
                 (a) => a.survivorId === survivorId && a.type === type,
             );
 
+        const hasPendingSearchFood = (survivorId: string) =>
+            state.pendingActivities.some(
+                (a) => a.survivorId === survivorId && a.type === 'searchFood',
+            );
+
         const processSurvivor = (
             survivor: Survivor,
             firstActivityType?: ReservedActivityType,
@@ -373,6 +391,11 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
                 if (
                     result.activity === 'restAtPlace' &&
                     hasPendingRest(survivor.id, 'restAtPlace')
+                )
+                    return;
+                if (
+                    result.activity === 'searchFood' &&
+                    hasPendingSearchFood(survivor.id)
                 )
                     return;
                 const v = settings.guidelinesValues;

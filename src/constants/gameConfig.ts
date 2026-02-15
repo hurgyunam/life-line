@@ -111,6 +111,14 @@ export const TECH_TREE_LAYOUT = {
     NODE_GAP: 24,
 } as const;
 
+/** 행동 지침 기본값 (기준치 등) */
+export const GUIDELINES_DEFAULT = {
+    /** 야생 딸기 재고가 이 값 이하일 때 야생 딸기 채취 지침 발동 */
+    WILD_STRAWBERRY_STOCK_THRESHOLD: 30,
+    /** 식수 재고가 이 값 이하일 때 식수 찾기 지침 발동 */
+    WATER_STOCK_THRESHOLD: 30,
+} as const;
+
 /** 활동 로그 UI */
 export const ACTIVITY_LOG = {
     /** 페이지당 표시할 로그 개수 */

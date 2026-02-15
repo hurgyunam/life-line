@@ -25,6 +25,8 @@
     "guidelines": {
         "list": ["Eat wild strawberries when hunger is 30 or below."],
         "templates": {
+            "wildStrawberryStockThreshold": "Gather wild strawberries when stock is {{wildStrawberryStockThreshold}} or below.",
+            "waterStockThreshold": "Search for water when stock is {{waterStockThreshold}} or below.",
             "hungerThreshold": "Eat {{foodResource}} when hunger is {{hungerThreshold}} or below.",
             "tirednessThreshold": "Sleep in an available {{sleepingBag}} when tiredness is {{tirednessThreshold}} or below.",
             "thirstThreshold": "Drink water when thirst is {{thirstThreshold}} or below.",
@@ -158,6 +160,8 @@
         "pageInfo": "Page {{current}} / {{total}}",
         "noMatches": "No matching entries.",
         "reason": {
+            "wildStrawberryStockThreshold": "wild strawberry stock was {{wildStrawberryStockThreshold}} or below",
+            "waterStockThreshold": "water stock was {{waterStockThreshold}} or below",
             "hungerThreshold": "hunger was at or below {{hungerThreshold}}",
             "thirstThreshold": "thirst was at or below {{thirstThreshold}}",
             "tirednessThreshold": "tiredness was at or below {{tirednessThreshold}}",

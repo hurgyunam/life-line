@@ -29,12 +29,12 @@ import type { SleepingBag } from '@/types/sleepingBag';
 import type { RestPlace } from '@/types/restPlace';
 
 interface GuidelineTemplate {
-  key: string
-  template: string
-  numberVariableKey?: string
-  foodVariableKey?: string
-  sleepingBagVariableKey?: string
-  restPlaceVariableKey?: string
+    key: string;
+    template: string;
+    numberVariableKey?: string;
+    foodVariableKey?: string;
+    sleepingBagVariableKey?: string;
+    restPlaceVariableKey?: string;
 }
 
 export function GuidelinesList() {
@@ -42,7 +42,8 @@ export function GuidelinesList() {
     const [settings, setSettingsState] = useState(getSettings());
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editingFood, setEditingFood] = useState<boolean>(false);
-    const [editingSleepingBag, setEditingSleepingBag] = useState<boolean>(false);
+    const [editingSleepingBag, setEditingSleepingBag] =
+        useState<boolean>(false);
     const [editingRestPlace, setEditingRestPlace] = useState<boolean>(false);
     const campResources = useCampResourceStore((state) => state.quantities);
 
@@ -50,7 +51,7 @@ export function GuidelinesList() {
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
-        })
+        }),
     );
 
     // 설정이 변경될 때마다 상태 업데이트
@@ -61,6 +62,18 @@ export function GuidelinesList() {
     // 행동 지침 템플릿 정의 (메모이제이션)
     const allGuidelineTemplates: Record<string, GuidelineTemplate> = useMemo(
         () => ({
+            wildStrawberryStockThreshold: {
+                key: 'wildStrawberryStockThreshold',
+                template: t(
+                    'guidelines.templates.wildStrawberryStockThreshold',
+                ),
+                numberVariableKey: 'wildStrawberryStockThreshold',
+            },
+            waterStockThreshold: {
+                key: 'waterStockThreshold',
+                template: t('guidelines.templates.waterStockThreshold'),
+                numberVariableKey: 'waterStockThreshold',
+            },
             hungerThreshold: {
                 key: 'hungerThreshold',
                 template: t('guidelines.templates.hungerThreshold'),
@@ -85,48 +98,60 @@ export function GuidelinesList() {
                 restPlaceVariableKey: 'restPlace',
             },
         }),
-        [t]
+        [t],
     );
 
     // 순서에 따라 정렬된 템플릿 배열 (메모이제이션)
     const guidelineTemplates = useMemo(
         () =>
-            (settings.guidelinesOrder || [
-                'hungerThreshold',
-                'tirednessThreshold',
-                'thirstThreshold',
-                'boredomThreshold',
-            ])
+            (
+                settings.guidelinesOrder || [
+                    'wildStrawberryStockThreshold',
+                    'waterStockThreshold',
+                    'hungerThreshold',
+                    'tirednessThreshold',
+                    'thirstThreshold',
+                    'boredomThreshold',
+                ]
+            )
                 .filter((key) => key in allGuidelineTemplates)
                 .map((key) => allGuidelineTemplates[key]),
-        [settings.guidelinesOrder, allGuidelineTemplates]
+        [settings.guidelinesOrder, allGuidelineTemplates],
     );
 
     const renderGuideline = useCallback(
         (template: GuidelineTemplate) => {
             const numberValue = template.numberVariableKey
-                ? (typeof settings.guidelinesValues[template.numberVariableKey] === 'number'
-                    ? settings.guidelinesValues[template.numberVariableKey]
-                    : null) as number | null
+                ? ((typeof settings.guidelinesValues[
+                      template.numberVariableKey
+                  ] === 'number'
+                      ? settings.guidelinesValues[template.numberVariableKey]
+                      : null) as number | null)
                 : null;
             const foodValue = template.foodVariableKey
-                ? (settings.guidelinesValues[template.foodVariableKey] as FoodResource) ?? 'wildStrawberry'
+                ? ((settings.guidelinesValues[
+                      template.foodVariableKey
+                  ] as FoodResource) ?? 'wildStrawberry')
                 : null;
             const sleepingBagValue = template.sleepingBagVariableKey
-                ? (settings.guidelinesValues[template.sleepingBagVariableKey] as SleepingBag) ?? 'sleepingBag1'
+                ? ((settings.guidelinesValues[
+                      template.sleepingBagVariableKey
+                  ] as SleepingBag) ?? 'sleepingBag1')
                 : null;
             const restPlaceValue = template.restPlaceVariableKey
-                ? (settings.guidelinesValues[template.restPlaceVariableKey] as RestPlace) ?? 'bareGround'
+                ? ((settings.guidelinesValues[
+                      template.restPlaceVariableKey
+                  ] as RestPlace) ?? 'bareGround')
                 : null;
 
             const templateText = template.template;
             const parts: (
-        | string
-        | { type: 'numberButton'; key: string; value: number }
-        | { type: 'foodButton'; key: string; value: FoodResource }
-        | { type: 'sleepingBagButton'; key: string; value: SleepingBag }
-        | { type: 'restPlaceButton'; key: string; value: RestPlace }
-      )[] = [];
+                | string
+                | { type: 'numberButton'; key: string; value: number }
+                | { type: 'foodButton'; key: string; value: FoodResource }
+                | { type: 'sleepingBagButton'; key: string; value: SleepingBag }
+                | { type: 'restPlaceButton'; key: string; value: RestPlace }
+            )[] = [];
             let lastIndex = 0;
 
             // {{variableKey}} 패턴 찾기
@@ -141,25 +166,37 @@ export function GuidelinesList() {
 
                 // 변수 타입에 따라 버튼 추가
                 const varKey = match[1];
-                if (varKey === template.numberVariableKey && numberValue !== null) {
+                if (
+                    varKey === template.numberVariableKey &&
+                    numberValue !== null
+                ) {
                     parts.push({
                         type: 'numberButton',
                         key: `${template.numberVariableKey}-${match.index}`,
                         value: numberValue,
                     });
-                } else if (varKey === template.foodVariableKey && foodValue !== null) {
+                } else if (
+                    varKey === template.foodVariableKey &&
+                    foodValue !== null
+                ) {
                     parts.push({
                         type: 'foodButton',
                         key: `${template.foodVariableKey}-${match.index}`,
                         value: foodValue,
                     });
-                } else if (varKey === template.sleepingBagVariableKey && sleepingBagValue !== null) {
+                } else if (
+                    varKey === template.sleepingBagVariableKey &&
+                    sleepingBagValue !== null
+                ) {
                     parts.push({
                         type: 'sleepingBagButton',
                         key: `${template.sleepingBagVariableKey}-${match.index}`,
                         value: sleepingBagValue,
                     });
-                } else if (varKey === template.restPlaceVariableKey && restPlaceValue !== null) {
+                } else if (
+                    varKey === template.restPlaceVariableKey &&
+                    restPlaceValue !== null
+                ) {
                     parts.push({
                         type: 'restPlaceButton',
                         key: `${template.restPlaceVariableKey}-${match.index}`,
@@ -167,7 +204,12 @@ export function GuidelinesList() {
                     });
                 } else {
                     // 다른 변수는 텍스트로 표시
-                    parts.push(templateText.slice(match.index, match.index + match[0].length));
+                    parts.push(
+                        templateText.slice(
+                            match.index,
+                            match.index + match[0].length,
+                        ),
+                    );
                 }
 
                 lastIndex = match.index + match[0].length;
@@ -185,7 +227,7 @@ export function GuidelinesList() {
 
             return parts;
         },
-        [settings.guidelinesValues]
+        [settings.guidelinesValues],
     );
 
     const handleNumberClick = (key: string) => {
@@ -257,6 +299,8 @@ export function GuidelinesList() {
 
         if (over && active.id !== over.id) {
             const currentOrder = settings.guidelinesOrder || [
+                'wildStrawberryStockThreshold',
+                'waterStockThreshold',
                 'hungerThreshold',
                 'tirednessThreshold',
                 'thirstThreshold',
@@ -310,7 +354,8 @@ export function GuidelinesList() {
                     key={editingKey}
                     variableKey={editingKey}
                     currentValue={
-                        typeof settings.guidelinesValues[editingKey] === 'number'
+                        typeof settings.guidelinesValues[editingKey] ===
+                        'number'
                             ? (settings.guidelinesValues[editingKey] as number)
                             : 30
                     }
@@ -322,7 +367,8 @@ export function GuidelinesList() {
             {editingFood && (
                 <FoodSelectModal
                     currentFood={
-                        (settings.guidelinesValues.foodResource as FoodResource) ?? 'wildStrawberry'
+                        (settings.guidelinesValues
+                            .foodResource as FoodResource) ?? 'wildStrawberry'
                     }
                     campResources={campResources}
                     onSave={handleFoodSave}
@@ -333,7 +379,8 @@ export function GuidelinesList() {
             {editingSleepingBag && (
                 <SleepingBagSelectModal
                     currentSleepingBag={
-                        (settings.guidelinesValues.sleepingBag as SleepingBag) ?? 'sleepingBag1'
+                        (settings.guidelinesValues
+                            .sleepingBag as SleepingBag) ?? 'sleepingBag1'
                     }
                     onSave={handleSleepingBagSave}
                     onClose={() => setEditingSleepingBag(false)}
@@ -343,7 +390,8 @@ export function GuidelinesList() {
             {editingRestPlace && (
                 <RestPlaceSelectModal
                     currentRestPlace={
-                        (settings.guidelinesValues.restPlace as RestPlace) ?? 'bareGround'
+                        (settings.guidelinesValues.restPlace as RestPlace) ??
+                        'bareGround'
                     }
                     onSave={handleRestPlaceSave}
                     onClose={() => setEditingRestPlace(false)}
@@ -354,18 +402,20 @@ export function GuidelinesList() {
 }
 
 interface SortableGuidelineItemProps {
-  template: GuidelineTemplate
-  onNumberClick: (key: string) => void
-  onFoodClick: () => void
-  onSleepingBagClick: () => void
-  onRestPlaceClick: () => void
-  renderGuideline: (template: GuidelineTemplate) => (
-    | string
-    | { type: 'numberButton'; key: string; value: number }
-    | { type: 'foodButton'; key: string; value: FoodResource }
-    | { type: 'sleepingBagButton'; key: string; value: SleepingBag }
-    | { type: 'restPlaceButton'; key: string; value: RestPlace }
-  )[]
+    template: GuidelineTemplate;
+    onNumberClick: (key: string) => void;
+    onFoodClick: () => void;
+    onSleepingBagClick: () => void;
+    onRestPlaceClick: () => void;
+    renderGuideline: (
+        template: GuidelineTemplate,
+    ) => (
+        | string
+        | { type: 'numberButton'; key: string; value: number }
+        | { type: 'foodButton'; key: string; value: FoodResource }
+        | { type: 'sleepingBagButton'; key: string; value: SleepingBag }
+        | { type: 'restPlaceButton'; key: string; value: RestPlace }
+    )[];
 }
 
 const SortableGuidelineItem = memo(function SortableGuidelineItem({
@@ -393,7 +443,10 @@ const SortableGuidelineItem = memo(function SortableGuidelineItem({
     };
 
     // renderGuideline 결과를 메모이제이션하여 드래그 중 불필요한 재계산 방지
-    const parts = useMemo(() => renderGuideline(template), [template, renderGuideline]);
+    const parts = useMemo(
+        () => renderGuideline(template),
+        [template, renderGuideline],
+    );
 
     return (
         <div
@@ -409,7 +462,10 @@ const SortableGuidelineItem = memo(function SortableGuidelineItem({
             >
                 <GripVertical className="w-5 h-5" />
             </button>
-            <div className="flex-1 min-w-0" style={{ pointerEvents: isDragging ? 'none' : 'auto' }}>
+            <div
+                className="flex-1 min-w-0"
+                style={{ pointerEvents: isDragging ? 'none' : 'auto' }}
+            >
                 <p className="text-gray-800 leading-relaxed flex flex-wrap items-center gap-1">
                     {parts.map((part, partIndex) => {
                         if (typeof part === 'string') {
@@ -424,7 +480,11 @@ const SortableGuidelineItem = memo(function SortableGuidelineItem({
                                 <button
                                     key={part.key}
                                     type="button"
-                                    onClick={() => onNumberClick(template.numberVariableKey!)}
+                                    onClick={() =>
+                                        onNumberClick(
+                                            template.numberVariableKey!,
+                                        )
+                                    }
                                     className={buttonClass}
                                     disabled={isDragging}
                                 >
