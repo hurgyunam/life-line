@@ -38,10 +38,12 @@ function App() {
   const hour = useGameTimeStore((state) => state.hour)
   const minute = useGameTimeStore((state) => state.minute)
   const completeDueActivities = useSurvivorStore((state) => state.completeDueActivities)
+  const processReservedActivities = useSurvivorStore((state) => state.processReservedActivities)
 
   useEffect(() => {
     completeDueActivities({ year, hour, minute })
-  }, [year, hour, minute, completeDueActivities])
+    processReservedActivities()
+  }, [year, hour, minute, completeDueActivities, processReservedActivities])
 
   // 자동 저장: 주기(분)마다 현재 세이브 덮어쓰기
   const lastSaveRef = useRef(Date.now())

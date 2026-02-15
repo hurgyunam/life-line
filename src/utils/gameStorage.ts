@@ -1,5 +1,5 @@
 import i18n from '@/i18n'
-import { useSurvivorStore, syncNextActivityId, type PendingActivity } from '@/stores/survivorStore'
+import { useSurvivorStore, syncNextActivityId, syncNextReservedId, type PendingActivity, type ReservedActivity } from '@/stores/survivorStore'
 import { useRegionCampStore } from '@/stores/regionCampStore'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useCampResourceStore, type CampResourceQuantities } from '@/stores/campResourceStore'
@@ -89,6 +89,7 @@ export interface SaveSlot {
   survivorData: {
     survivors: Survivor[]
     pendingActivities: PendingActivity[]
+    reservedActivities: ReservedActivity[]
     discoveredSurvivorCount: number
     researchProgress: number
   }
@@ -177,6 +178,7 @@ export function createSave(name?: string): SaveSlot {
     survivorData: {
       survivors: survivorState.survivors,
       pendingActivities: survivorState.pendingActivities,
+      reservedActivities: survivorState.reservedActivities,
       discoveredSurvivorCount: survivorState.discoveredSurvivorCount,
       researchProgress: survivorState.researchProgress,
     },
@@ -213,15 +215,22 @@ export function loadSave(saveId: string): boolean {
   const pendingActivities: PendingActivity[] = Array.isArray(survivorData.pendingActivities)
     ? survivorData.pendingActivities
     : []
+  const reservedActivities: ReservedActivity[] = Array.isArray(survivorData.reservedActivities)
+    ? survivorData.reservedActivities
+    : []
 
   useSurvivorStore.setState({
     survivors,
     pendingActivities,
+    reservedActivities,
     discoveredSurvivorCount: survivorData.discoveredSurvivorCount ?? 0,
     researchProgress: survivorData.researchProgress ?? 0,
   })
   if (pendingActivities.length > 0) {
     syncNextActivityId(pendingActivities)
+  }
+  if (reservedActivities.length > 0) {
+    syncNextReservedId(reservedActivities)
   }
 
   const facilitiesByRegion =
@@ -296,6 +305,7 @@ export function overwriteSave(saveId: string): boolean {
   slot.survivorData = {
     survivors: survivorState.survivors,
     pendingActivities: survivorState.pendingActivities,
+    reservedActivities: survivorState.reservedActivities,
     discoveredSurvivorCount: survivorState.discoveredSurvivorCount,
     researchProgress: survivorState.researchProgress,
   }
