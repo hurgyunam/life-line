@@ -10,6 +10,7 @@ import {
 import { GameHeader } from '@/components/layout/GameHeader';
 import { Dashboard } from '@/components/pages/Dashboard';
 import { Settings } from '@/components/pages/Settings';
+import { ActivityLog } from '@/components/pages/ActivityLog';
 import { CampResources } from '@/components/camp/CampResources';
 import { useGameTimeStore } from '@/stores/gameTimeStore';
 import { useSurvivorStore } from '@/stores/survivorStore';
@@ -80,11 +81,12 @@ function App() {
                     {currentPage === 'dashboard' && <Dashboard survivors={survivors} />}
                     {currentPage === 'settings' && <Settings />}
                     {currentPage === 'campResources' && <CampResources />}
-                    {(currentPage === 'quest' || currentPage === 'activityLog') && (
+                    {currentPage === 'quest' && (
                         <div className="flex items-center justify-center min-h-[200px]">
                             <p className="text-gray-500">{t('page.comingSoon')}</p>
                         </div>
                     )}
+                    {currentPage === 'activityLog' && <ActivityLog />}
                 </div>
                 <BottomNav currentPage={currentPage} onNavigate={setCurrentPage} />
             </main>

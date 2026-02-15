@@ -128,6 +128,12 @@
     "waiting": "대기 중",
     "searching_food": "음식 찾아보기"
   },
+  "activityLog": {
+    "inProgress": "진행 중",
+    "reserved": "예약됨",
+    "noInProgress": "진행 중인 활동이 없습니다.",
+    "empty": "진행 중이거나 예약된 활동이 없습니다."
+  },
   "dashboard": {
     "stats": "통계",
     "resources": "자원",

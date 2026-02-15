@@ -128,6 +128,12 @@
     "waiting": "Waiting",
     "searching_food": "Searching for food"
   },
+  "activityLog": {
+    "inProgress": "In Progress",
+    "reserved": "Scheduled",
+    "noInProgress": "No activities in progress.",
+    "empty": "No activities in progress or scheduled."
+  },
   "dashboard": {
     "stats": "Stats",
     "resources": "Resources",
