@@ -108,6 +108,18 @@ function PlaceholderIcon({ className }: { className?: string }) {
 
 const APP_VERSION = '1.0.0'
 
+/** Production dependencies - 라이선스 표시용 */
+const THIRD_PARTY_LICENSES: Array<{ name: string; license: string; copyright: string }> = [
+  { name: 'React', license: 'MIT', copyright: '© Meta Platforms, Inc. and affiliates' },
+  { name: 'i18next', license: 'MIT', copyright: '© i18next' },
+  { name: 'react-i18next', license: 'MIT', copyright: '© 2015-present i18next' },
+  { name: 'Zustand', license: 'MIT', copyright: '© 2019 Paul Henschel' },
+  { name: 'Lucide Icons', license: 'ISC/MIT', copyright: '© Cole Bemis, Lucide Contributors' },
+  { name: 'Vite', license: 'MIT', copyright: '© VoidZero Inc., Vite contributors' },
+  { name: 'Tailwind CSS', license: 'MIT', copyright: '© Tailwind Labs, Inc.' },
+  { name: 'TypeScript', license: 'Apache-2.0', copyright: '© Microsoft Corporation' },
+]
+
 export function Settings() {
   const { t, i18n } = useTranslation()
   const [showLanguageModal, setShowLanguageModal] = useState(false)
@@ -242,9 +254,17 @@ export function Settings() {
             <h4 className="mb-2 text-sm font-medium text-gray-700">
               {t('settings.aboutLicenses')}
             </h4>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              {t('settings.aboutLucide')}
-            </p>
+            <ul className="space-y-2 text-xs text-gray-600 leading-relaxed">
+              {THIRD_PARTY_LICENSES.map(({ name, license, copyright }) => (
+                <li key={name}>
+                  <span className="font-medium text-gray-700">{name}</span>
+                  {' · '}
+                  {license}
+                  {' · '}
+                  <span className="text-gray-500">{copyright}</span>
+                </li>
+              ))}
+            </ul>
             <button
               type="button"
               onClick={() => setShowAboutModal(false)}

@@ -94,8 +94,7 @@
     "aboutTitle": "About",
     "aboutAppName": "Life Line",
     "aboutVersion": "Version {{version}}",
-    "aboutLicenses": "Open Source Licenses",
-    "aboutLucide": "Icons: Lucide (lucide.dev) · ISC/MIT License · © Cole Bemis, Lucide Contributors"
+    "aboutLicenses": "Open Source Licenses"
   },
   "common": {
     "cancel": "Cancel",
