@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
 import type { Survivor } from '@/types/survivor'
-import { GaugeBar } from '@/components/GaugeBar'
-import { statusColors } from '@/components/SurvivorList'
+import { GaugeBar } from '@/components/ui/GaugeBar'
+import { statusColors } from '@/components/survivor/SurvivorList'
 import { GAME_TIME_CONFIG, ACTIVITY_BALANCE } from '@/constants/gameConfig'
 
 function addMinutesToTime(

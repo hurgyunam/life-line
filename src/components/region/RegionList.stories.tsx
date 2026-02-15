@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import App from './App'
+import { RegionList } from '@/components/region/RegionList'
 
 const meta = {
-  title: 'App',
-  component: App,
+  title: '지역/캠프/RegionList',
+  component: RegionList,
   parameters: {
-    layout: 'fullscreen',
+    layout: 'centered',
   },
-} satisfies Meta<typeof App>
+} satisfies Meta<typeof RegionList>
 
 export default meta
 

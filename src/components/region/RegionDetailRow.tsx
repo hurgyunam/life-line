@@ -6,7 +6,7 @@ import type { Facility } from '@/types/facility'
 import { RESOURCE_ICONS } from '@/constants/resourceIcons'
 import { FACILITY_ICONS } from '@/constants/facilityIcons'
 import { useRegionCampStore } from '@/stores/regionCampStore'
-import { FacilityBuildPopup } from '@/components/FacilityBuildPopup'
+import { FacilityBuildPopup } from '@/components/region/FacilityBuildPopup'
 
 interface RegionDetailRowProps {
   region: Region

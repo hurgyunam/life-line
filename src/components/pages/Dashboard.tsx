@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Survivor } from '@/types/survivor'
-import { SurvivorList } from '@/components/SurvivorList'
-import { RegionList } from '@/components/RegionList'
+import { SurvivorList } from '@/components/survivor/SurvivorList'
+import { RegionList } from '@/components/region/RegionList'
 
 interface DashboardTile {
   id: string
