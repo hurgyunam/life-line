@@ -138,7 +138,31 @@
         "inProgress": "진행 중",
         "reserved": "예약됨",
         "noInProgress": "진행 중인 활동이 없습니다.",
-        "empty": "진행 중이거나 예약된 활동이 없습니다."
+        "empty": "아직 기록된 활동이 없습니다.",
+        "line": "개척왕 {{year}}년 {{hour}}시 {{minute}}분 {{name}}이(가) {{action}}",
+        "started": {
+            "eatWildStrawberry": "야생 딸기 먹기를 시작함",
+            "drinkWater": "식수 마시기를 시작함",
+            "searchFood": "음식 찾기를 시작함",
+            "searchWater": "식수 찾기를 시작함",
+            "searchSurvivor": "생존자 찾기를 시작함",
+            "doResearch": "연구를 시작함",
+            "restWithSleepingBag": "침낭에서 취침을 시작함",
+            "restAtPlace": "휴식을 시작함"
+        },
+        "filterSurvivor": "생존자",
+        "filterType": "활동 유형",
+        "filterAll": "전체",
+        "prevPage": "이전",
+        "nextPage": "다음",
+        "pageInfo": "{{current}} / {{total}} 페이지",
+        "noMatches": "조건에 맞는 기록이 없습니다.",
+        "reason": {
+            "hungerThreshold": "배고픔이 {{hungerThreshold}} 이하라서",
+            "thirstThreshold": "목마름이 {{thirstThreshold}} 이하라서",
+            "tirednessThreshold": "피곤함이 {{tirednessThreshold}} 이하라서",
+            "boredomThreshold": "지루함이 {{boredomThreshold}} 이하라서"
+        }
     },
     "dashboard": {
         "stats": "통계",

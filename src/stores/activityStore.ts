@@ -33,6 +33,7 @@ import { useCampResourceStore } from '@/stores/campResourceStore';
 import { useSurvivorStore } from '@/stores/survivorStore';
 import type {
     ActivityState,
+    ActivityLogEntry,
     PendingActivity,
     ReservedActivity,
     ReservedActivityType,
@@ -45,14 +46,47 @@ export type {
     PendingActivity,
     ReservedActivity,
     ReservedActivityType,
+    ActivityLogEntry,
 };
 export { syncNextActivityId, syncNextReservedId };
 
 const QUEUE_WAIT = ACTIVITY_BALANCE.QUEUE_WAIT_MINUTES;
 
+const MAX_LOG_ENTRIES = 300;
+
+/** 지침 키와 설정으로 로그 이유용 params 생성 (예약 시점 값 보존용) */
+function buildReasonParams(
+    guidelineKey: string | undefined,
+    v: Record<string, number | string>,
+): Record<string, string | number> | undefined {
+    if (!guidelineKey) return undefined;
+    switch (guidelineKey) {
+        case 'hungerThreshold':
+            return {
+                hungerThreshold: (v.hungerThreshold as number) ?? 30,
+                foodResource: (v.foodResource as string) ?? 'wildStrawberry',
+            };
+        case 'thirstThreshold':
+            return { thirstThreshold: (v.thirstThreshold as number) ?? 30 };
+        case 'tirednessThreshold':
+            return {
+                tirednessThreshold: (v.tirednessThreshold as number) ?? 30,
+                sleepingBag: (v.sleepingBag as string) ?? 'sleepingBag1',
+            };
+        case 'boredomThreshold':
+            return {
+                boredomThreshold: (v.boredomThreshold as number) ?? 30,
+                restPlace: (v.restPlace as string) ?? 'bareGround',
+            };
+        default:
+            return undefined;
+    }
+}
+
 export const useActivityStore = create<ActivityState>((set, get) => ({
     pendingActivities: [],
     reservedActivities: [],
+    activityLogEntries: [],
     activityStartTimes: {},
     guidelineSatisfyingPhase: {},
     discoveredSurvivorCount: 0,
@@ -60,6 +94,17 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
 
     addPendingActivity: (activity) => {
         set((s) => ({ pendingActivities: [...s.pendingActivities, activity] }));
+    },
+
+    addActivityLogEntry: (entry) => {
+        set((s) => {
+            const next = [...s.activityLogEntries, entry];
+            if (next.length > MAX_LOG_ENTRIES)
+                return {
+                    activityLogEntries: next.slice(-MAX_LOG_ENTRIES),
+                };
+            return { activityLogEntries: next };
+        });
     },
 
     startSearchFood: (survivorId, endAt) => {
@@ -242,6 +287,21 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         });
 
         if (success) {
+            const entry: Parameters<ActivityState['addActivityLogEntry']>[0] = {
+                at: now,
+                survivorId: reserved.survivorId,
+                type: reserved.type,
+            };
+            if (reserved.guidelineKey) {
+                entry.reasonKey = reserved.guidelineKey;
+                entry.reasonParams =
+                    reserved.reasonParams ??
+                    buildReasonParams(
+                        reserved.guidelineKey,
+                        getSettings().guidelinesValues,
+                    );
+            }
+            get().addActivityLogEntry(entry);
             set((s) => ({
                 reservedActivities: s.reservedActivities.filter(
                     (a) => a.id !== id,
@@ -315,10 +375,13 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
                     hasPendingRest(survivor.id, 'restAtPlace')
                 )
                     return;
+                const v = settings.guidelinesValues;
                 newReserved.push({
                     id: genReservedId(),
                     survivorId: survivor.id,
                     type: result.activity,
+                    guidelineKey: result.guidelineKey,
+                    reasonParams: buildReasonParams(result.guidelineKey, v),
                 });
             }
             return result.activity;

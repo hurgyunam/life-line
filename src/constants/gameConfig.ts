@@ -111,6 +111,23 @@ export const TECH_TREE_LAYOUT = {
     NODE_GAP: 24,
 } as const;
 
+/** 활동 로그 UI */
+export const ACTIVITY_LOG = {
+    /** 페이지당 표시할 로그 개수 */
+    PAGE_SIZE: 20,
+    /** 필터에 사용할 활동 타입 목록 (ReservedActivityType과 동일 순서) */
+    FILTER_TYPES: [
+        'eatWildStrawberry',
+        'drinkWater',
+        'searchFood',
+        'searchWater',
+        'searchSurvivor',
+        'doResearch',
+        'restWithSleepingBag',
+        'restAtPlace',
+    ] as const,
+} as const;
+
 /** 자동 저장 주기 옵션 (분 단위, 0 = 끄기) */
 export const AUTO_SAVE_INTERVAL_OPTIONS = [0, 1, 3, 5, 10] as const;
 export type AutoSaveIntervalMinutes =
