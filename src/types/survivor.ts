@@ -9,7 +9,7 @@ export type SurvivorStatus =
 
 /** 현재 행동 (번역 키) */
 export type SurvivorAction =
-  | 'farming_carrots'
+  | 'farming_wildStrawberries'
   | 'mining_stones'
   | 'chopping_wood'
   | 'resting'
@@ -20,8 +20,8 @@ export type SurvivorAction =
 
 /** 개인 소지품 */
 export interface SurvivorInventory {
-  /** 당근 개수 */
-  carrot: number
+  /** 야생 딸기 개수 */
+  wildStrawberry: number
   /** 식수 개수 */
   water: number
 }

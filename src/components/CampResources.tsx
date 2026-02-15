@@ -11,8 +11,8 @@ import {
   LeafyGreen,
   Wheat,
 } from 'lucide-react'
-import { CAMP_RESOURCES } from '@/constants/gameConfig'
-import { useCampResourceStore, type CampResourceKey } from '@/stores/campResourceStore'
+import { CAMP_RESOURCES, type CampResource } from '@/types/resource'
+import { useCampResourceStore } from '@/stores/campResourceStore'
 
 const resourceIcons: Record<string, React.ReactNode> = {
   wood: <Trees className="h-5 w-5" />,
@@ -56,7 +56,7 @@ export function CampResources() {
   const constructionKeys = CAMP_RESOURCES.CONSTRUCTION
   const foodKeys = CAMP_RESOURCES.CONSUMABLE.food
 
-  const getCount = (key: CampResourceKey) => quantities[key] ?? 0
+  const getCount = (key: CampResource) => quantities[key] ?? 0
 
   return (
     <div className="space-y-6">

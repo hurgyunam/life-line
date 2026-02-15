@@ -41,9 +41,9 @@
     "status": "Status",
     "currentAction": "Current Action",
     "inventory": "Personal Inventory",
-    "carrotCount": "{{count}} carrots",
+    "wildStrawberryCount": "{{count}} wild strawberries",
     "waterCount": "{{count}} waters",
-    "eatCarrot": "Eat carrot",
+    "eatWildStrawberry": "Eat wild strawberry",
     "drinkWater": "Drink water",
     "activities": "Activities",
     "searchFood": "Search for food ({{hours}}h)",
@@ -67,7 +67,7 @@
     "satisfied": "Satisfied"
   },
   "action": {
-    "farming_carrots": "Farming carrots",
+    "farming_wildStrawberries": "Harvesting wild strawberries",
     "mining_stones": "Mining stones",
     "chopping_wood": "Chopping wood",
     "resting": "Resting",

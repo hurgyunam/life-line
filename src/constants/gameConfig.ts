@@ -2,6 +2,8 @@
  * 게임 밸런스 관련 상수 모음
  */
 
+import type { CampResource } from '@/types/resource'
+
 export const GAME_TIME_CONFIG = {
   MINUTES_PER_HOUR: 60,
   HOURS_PER_DAY: 24,
@@ -12,7 +14,7 @@ export const ACTIVITY_BALANCE = {
   // 음식 찾아보기
   FOOD_SEARCH: {
     DURATION_HOURS: 1,
-    CARROT_GAIN: 1,
+    WILD_STRAWBERRY_GAIN: 1,
   },
   // 식수 찾아보기
   WATER_SEARCH: {
@@ -32,29 +34,18 @@ export const ACTIVITY_BALANCE = {
 
 export const SURVIVOR_BALANCE = {
   // 아이템 사용 효과
-  EAT_CARROT_HUNGER_GAIN: 15,
+  EAT_WILD_STRAWBERRY_HUNGER_GAIN: 15,
   DRINK_WATER_THIRST_GAIN: 15,
   
   // 초기 인벤토리
   INITIAL_INVENTORY: {
-    CARROT: 10,
+    WILD_STRAWBERRY: 10,
     WATER: 10,
   },
 } as const
 
-/** 캠프 자원 분류 및 종류 */
-export const CAMP_RESOURCES = {
-  /** 건축/조합용 자원 */
-  CONSTRUCTION: ['wood', 'stone', 'ironOre', 'cotton', 'leather'] as const,
-  /** 소비용 자원 */
-  CONSUMABLE: {
-    water: 'water',
-    food: ['wildStrawberry', 'potato', 'corn', 'wheat'] as const,
-  },
-} as const
-
 /** 캠프 자원 초기 수량 */
-export const CAMP_RESOURCES_INITIAL: Record<string, number> = {
+export const CAMP_RESOURCES_INITIAL: Record<CampResource, number> = {
   wood: 0,
   stone: 0,
   ironOre: 0,

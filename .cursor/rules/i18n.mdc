@@ -23,10 +23,10 @@ alwaysApply: false
    - 네임스페이스: `nav`, `page`, `gameHeader`, `survivorList`, `survivorDetail`, `status`, `action`, `settings`
 
 3. **동적 값 삽입**  
-   `t('key', { param: value })` 형식 사용. 예: `t('survivorDetail.carrotCount', { count: 5 })`
+   `t('key', { param: value })` 형식 사용. 예: `t('survivorDetail.wildStrawberryCount', { count: 5 })`
 
 4. **상태/행동 등 데이터**  
-   Survivor의 `status`, `currentAction`은 번역 키(예: `hungry`, `farming_carrots`)를 저장하고, 표시 시 `t(\`status.${status}\`)`로 번역한다.
+   Survivor의 `status`, `currentAction`은 번역 키(예: `hungry`, `farming_wildStrawberries`)를 저장하고, 표시 시 `t(\`status.${status}\`)`로 번역한다.
 
 5. **새 언어 추가**  
    - `src/i18n/locales/{lang}.json` 생성

@@ -41,12 +41,12 @@ function addMinutesToPoint(t: GameTimePoint, minutes: number): GameTimePoint {
 }
 
 const defaultInventory = { 
-  carrot: SURVIVOR_BALANCE.INITIAL_INVENTORY.CARROT, 
+  wildStrawberry: SURVIVOR_BALANCE.INITIAL_INVENTORY.WILD_STRAWBERRY, 
   water: SURVIVOR_BALANCE.INITIAL_INVENTORY.WATER 
 }
 
 const initialSurvivors: Survivor[] = [
-  { id: '1', name: '김민수', age: 32, status: 'healthy', currentAction: 'farming_carrots', hunger: 85, tiredness: 70, thirst: 90, boredom: 75, inventory: { ...defaultInventory } },
+  { id: '1', name: '김민수', age: 32, status: 'healthy', currentAction: 'farming_wildStrawberries', hunger: 85, tiredness: 70, thirst: 90, boredom: 75, inventory: { ...defaultInventory } },
   { id: '2', name: '이서연', age: 28, status: 'bored', currentAction: 'mining_stones', hunger: 60, tiredness: 55, thirst: 45, boredom: 30, inventory: { ...defaultInventory } },
   { id: '3', name: '박준호', age: 45, status: 'hungry', currentAction: 'cooking', hunger: 20, tiredness: 65, thirst: 50, boredom: 65, inventory: { ...defaultInventory } },
   { id: '4', name: '최지은', age: 24, status: 'tired', currentAction: 'resting', hunger: 75, tiredness: 25, thirst: 80, boredom: 55, inventory: { ...defaultInventory } },
@@ -64,9 +64,9 @@ interface SurvivorState {
   discoveredSurvivorCount: number
   /** 연구 진행도 */
   researchProgress: number
-  eatCarrot: (survivorId: string) => void
+  eatWildStrawberry: (survivorId: string) => void
   drinkWater: (survivorId: string) => void
-  /** 음식 찾기 시작 — 1시간 후 완료 시 당근 1개 추가 */
+  /** 음식 찾기 시작 — 1시간 후 완료 시 야생 딸기 1개 추가 */
   startSearchFood: (survivorId: string, endAt: GameTimePoint) => void
   /** 현재 시각 기준으로 만료된 진행 중 활동 완료 처리 */
   completeDueActivities: (now: GameTimePoint) => void
@@ -89,14 +89,14 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
   pendingActivities: [],
   discoveredSurvivorCount: 0,
   researchProgress: 0,
-  eatCarrot: (survivorId) =>
+  eatWildStrawberry: (survivorId) =>
     set((state) => ({
       survivors: state.survivors.map((s) => {
-        if (s.id !== survivorId || s.inventory.carrot <= 0) return s
+        if (s.id !== survivorId || s.inventory.wildStrawberry <= 0) return s
         return {
           ...s,
-          inventory: { ...s.inventory, carrot: s.inventory.carrot - 1 },
-          hunger: Math.min(100, s.hunger + SURVIVOR_BALANCE.EAT_CARROT_HUNGER_GAIN),
+          inventory: { ...s.inventory, wildStrawberry: s.inventory.wildStrawberry - 1 },
+          hunger: Math.min(100, s.hunger + SURVIVOR_BALANCE.EAT_WILD_STRAWBERRY_HUNGER_GAIN),
         }
       }),
     })),
@@ -144,7 +144,7 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
           ...s,
           inventory: {
             ...s.inventory,
-            carrot: s.inventory.carrot + completed.length * ACTIVITY_BALANCE.FOOD_SEARCH.CARROT_GAIN,
+            wildStrawberry: s.inventory.wildStrawberry + completed.length * ACTIVITY_BALANCE.FOOD_SEARCH.WILD_STRAWBERRY_GAIN,
           },
         }
       }),
