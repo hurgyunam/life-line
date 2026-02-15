@@ -8,11 +8,18 @@
 import { create } from 'zustand';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { Survivor } from '@/types/survivor';
-import { GAME_TIME_CONFIG, ACTIVITY_BALANCE } from '@/constants/gameConfig';
+import {
+    GAME_TIME_CONFIG,
+    ACTIVITY_BALANCE,
+    CONSUMABLE_ACTIVITIES,
+} from '@/constants/gameConfig';
 import { getGuidelineActivityForSurvivor } from '@/logic/guidelineActivities';
 import { getSettings } from '@/utils/gameStorage';
 import { useGameTimeStore } from '@/stores/gameTimeStore';
-import { runActivityEffect, runUpdateSurvivorStat } from '@/effects/activityEffectRegistry';
+import {
+    runActivityEffect,
+    runUpdateSurvivorStat,
+} from '@/effects/activityEffectRegistry';
 import {
     toMinutes,
     addMinutesToPoint,
@@ -33,7 +40,12 @@ import type {
 } from '@/stores/survivorStore.types';
 
 // Re-export for consumers
-export type { GameTimePoint, PendingActivity, ReservedActivity, ReservedActivityType };
+export type {
+    GameTimePoint,
+    PendingActivity,
+    ReservedActivity,
+    ReservedActivityType,
+};
 export { syncNextActivityId, syncNextReservedId };
 
 const QUEUE_WAIT = ACTIVITY_BALANCE.QUEUE_WAIT_MINUTES;
@@ -52,7 +64,10 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
 
     startSearchFood: (survivorId, endAt) => {
         set((s) => ({
-            pendingActivities: [...s.pendingActivities, { id: genActivityId(), survivorId, type: 'searchFood', endAt }],
+            pendingActivities: [
+                ...s.pendingActivities,
+                { id: genActivityId(), survivorId, type: 'searchFood', endAt },
+            ],
         }));
     },
 
@@ -60,12 +75,29 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         set((state) => {
             const activity = state.pendingActivities.find((a) => a.id === id);
             const phaseClears: Record<string, string | null> = {};
-            if (activity && (activity.type === 'restWithSleepingBag' || activity.type === 'restAtPlace')) {
+            if (
+                activity &&
+                (activity.type === 'restWithSleepingBag' ||
+                    activity.type === 'restAtPlace')
+            ) {
                 phaseClears[activity.survivorId] = null;
             }
+            if (
+                activity?.type === 'consumeResource' &&
+                activity.consumableKey
+            ) {
+                useCampResourceStore
+                    .getState()
+                    .addQuantity(activity.consumableKey, 1);
+            }
             return {
-                pendingActivities: state.pendingActivities.filter((a) => a.id !== id),
-                guidelineSatisfyingPhase: { ...state.guidelineSatisfyingPhase, ...phaseClears },
+                pendingActivities: state.pendingActivities.filter(
+                    (a) => a.id !== id,
+                ),
+                guidelineSatisfyingPhase: {
+                    ...state.guidelineSatisfyingPhase,
+                    ...phaseClears,
+                },
             };
         });
     },
@@ -73,10 +105,14 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
     completeDueActivities: (now) => {
         const state = get();
         const nowM = toMinutes(now);
-        const due = state.pendingActivities.filter((a) => toMinutes(a.endAt) <= nowM);
+        const due = state.pendingActivities.filter(
+            (a) => toMinutes(a.endAt) <= nowM,
+        );
         if (due.length === 0) return;
 
-        const remaining = state.pendingActivities.filter((a) => !due.includes(a));
+        const remaining = state.pendingActivities.filter(
+            (a) => !due.includes(a),
+        );
         const newActivities: PendingActivity[] = [...remaining];
         const phaseClears: Record<string, string | null> = {};
 
@@ -86,7 +122,11 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
                     id: genActivityId(),
                     survivorId: a.survivorId,
                     type: 'searchFood',
-                    endAt: addMinutesToPoint(now, ACTIVITY_BALANCE.FOOD_SEARCH.DURATION_HOURS * GAME_TIME_CONFIG.MINUTES_PER_HOUR),
+                    endAt: addMinutesToPoint(
+                        now,
+                        ACTIVITY_BALANCE.FOOD_SEARCH.DURATION_HOURS *
+                            GAME_TIME_CONFIG.MINUTES_PER_HOUR,
+                    ),
                 });
             }
         }
@@ -95,12 +135,47 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
             if (a.type === 'searchFood') {
                 useCampResourceStore
                     .getState()
-                    .addQuantity('wildStrawberry', ACTIVITY_BALANCE.FOOD_SEARCH.WILD_STRAWBERRY_GAIN);
+                    .addQuantity(
+                        'wildStrawberry',
+                        ACTIVITY_BALANCE.FOOD_SEARCH.WILD_STRAWBERRY_GAIN,
+                    );
+            }
+            if (a.type === 'consumeResource' && a.consumableKey) {
+                const config = CONSUMABLE_ACTIVITIES[a.consumableKey];
+                if (!config) continue;
+                useSurvivorStore
+                    .getState()
+                    .applyConsumableBenefit(a.survivorId, a.consumableKey);
+                const survivor = useSurvivorStore
+                    .getState()
+                    .survivors.find((s) => s.id === a.survivorId);
+                const resourceQty = useCampResourceStore
+                    .getState()
+                    .getQuantity(a.consumableKey);
+                const statValue =
+                    config.stat === 'hunger'
+                        ? (survivor?.hunger ?? 0)
+                        : (survivor?.thirst ?? 0);
+                if (survivor && statValue < 100 && resourceQty > 0) {
+                    newActivities.push({
+                        id: genActivityId(),
+                        survivorId: a.survivorId,
+                        type: 'consumeResource',
+                        endAt: addMinutesToPoint(now, config.durationMinutes),
+                        consumableKey: a.consumableKey,
+                    });
+                    useCampResourceStore
+                        .getState()
+                        .addQuantity(a.consumableKey, -1);
+                }
             }
             if (a.type === 'restWithSleepingBag' || a.type === 'restAtPlace') {
                 runUpdateSurvivorStat({
                     survivorId: a.survivorId,
-                    stat: a.type === 'restWithSleepingBag' ? 'tiredness' : 'boredom',
+                    stat:
+                        a.type === 'restWithSleepingBag'
+                            ? 'tiredness'
+                            : 'boredom',
                     value: 100,
                 });
                 phaseClears[a.survivorId] = null;
@@ -109,29 +184,47 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
 
         set({
             pendingActivities: newActivities,
-            guidelineSatisfyingPhase: { ...state.guidelineSatisfyingPhase, ...phaseClears },
+            guidelineSatisfyingPhase: {
+                ...state.guidelineSatisfyingPhase,
+                ...phaseClears,
+            },
         });
     },
 
     searchWater: () => {
-        const gain = randomInRange(ACTIVITY_BALANCE.WATER_SEARCH.GAIN_MIN, ACTIVITY_BALANCE.WATER_SEARCH.GAIN_MAX);
+        const gain = randomInRange(
+            ACTIVITY_BALANCE.WATER_SEARCH.GAIN_MIN,
+            ACTIVITY_BALANCE.WATER_SEARCH.GAIN_MAX,
+        );
         useCampResourceStore.getState().addQuantity('water', gain);
     },
 
     searchSurvivor: () => {
-        set((s) => ({ discoveredSurvivorCount: s.discoveredSurvivorCount + 1 }));
+        set((s) => ({
+            discoveredSurvivorCount: s.discoveredSurvivorCount + 1,
+        }));
     },
 
     doResearch: () => {
-        set((s) => ({ researchProgress: s.researchProgress + ACTIVITY_BALANCE.RESEARCH.PROGRESS_GAIN }));
+        set((s) => ({
+            researchProgress:
+                s.researchProgress + ACTIVITY_BALANCE.RESEARCH.PROGRESS_GAIN,
+        }));
     },
 
     addReservedActivity: (survivorId, type) => {
-        set((s) => ({ reservedActivities: [...s.reservedActivities, { id: genReservedId(), survivorId, type }] }));
+        set((s) => ({
+            reservedActivities: [
+                ...s.reservedActivities,
+                { id: genReservedId(), survivorId, type },
+            ],
+        }));
     },
 
     removeReservedActivity: (id) => {
-        set((s) => ({ reservedActivities: s.reservedActivities.filter((a) => a.id !== id) }));
+        set((s) => ({
+            reservedActivities: s.reservedActivities.filter((a) => a.id !== id),
+        }));
     },
 
     executeReservedActivity: (id) => {
@@ -149,20 +242,26 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         });
 
         if (success) {
-            set((s) => ({ reservedActivities: s.reservedActivities.filter((a) => a.id !== id) }));
+            set((s) => ({
+                reservedActivities: s.reservedActivities.filter(
+                    (a) => a.id !== id,
+                ),
+            }));
         }
         return success;
     },
 
     reorderReservedActivities: (survivorId, oldIndex, newIndex) => {
         set((state) => {
-            const survivorItems = state.reservedActivities.filter((a) => a.survivorId === survivorId);
+            const survivorItems = state.reservedActivities.filter(
+                (a) => a.survivorId === survivorId,
+            );
             const validRange =
-        survivorItems.length > 1 &&
-        oldIndex >= 0 &&
-        oldIndex < survivorItems.length &&
-        newIndex >= 0 &&
-        newIndex < survivorItems.length;
+                survivorItems.length > 1 &&
+                oldIndex >= 0 &&
+                oldIndex < survivorItems.length &&
+                newIndex >= 0 &&
+                newIndex < survivorItems.length;
             if (!validRange) return state;
             const reordered = arrayMove(survivorItems, oldIndex, newIndex);
             const globalIndices = state.reservedActivities
@@ -184,19 +283,43 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         const newReserved: ReservedActivity[] = [];
         const phaseUpdates: Record<string, string | null> = {};
 
-        const hasPendingRest = (survivorId: string, type: 'restWithSleepingBag' | 'restAtPlace') =>
-            state.pendingActivities.some((a) => a.survivorId === survivorId && a.type === type);
+        const hasPendingRest = (
+            survivorId: string,
+            type: 'restWithSleepingBag' | 'restAtPlace',
+        ) =>
+            state.pendingActivities.some(
+                (a) => a.survivorId === survivorId && a.type === type,
+            );
 
-        const processSurvivor = (survivor: Survivor, firstActivityType?: ReservedActivityType) => {
+        const processSurvivor = (
+            survivor: Survivor,
+            firstActivityType?: ReservedActivityType,
+        ) => {
             const phase = state.guidelineSatisfyingPhase[survivor.id] ?? null;
-            const result = getGuidelineActivityForSurvivor(survivor, settings, phase);
+            const result = getGuidelineActivityForSurvivor(
+                survivor,
+                settings,
+                phase,
+            );
             if (result.newPhase !== undefined) {
                 phaseUpdates[survivor.id] = result.newPhase ?? null;
             }
             if (result.activity && firstActivityType !== result.activity) {
-                if (result.activity === 'restWithSleepingBag' && hasPendingRest(survivor.id, 'restWithSleepingBag')) return;
-                if (result.activity === 'restAtPlace' && hasPendingRest(survivor.id, 'restAtPlace')) return;
-                newReserved.push({ id: genReservedId(), survivorId: survivor.id, type: result.activity });
+                if (
+                    result.activity === 'restWithSleepingBag' &&
+                    hasPendingRest(survivor.id, 'restWithSleepingBag')
+                )
+                    return;
+                if (
+                    result.activity === 'restAtPlace' &&
+                    hasPendingRest(survivor.id, 'restAtPlace')
+                )
+                    return;
+                newReserved.push({
+                    id: genReservedId(),
+                    survivorId: survivor.id,
+                    type: result.activity,
+                });
             }
             return result.activity;
         };
@@ -215,12 +338,19 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         }
 
         const hasChanges =
-      newReserved.length !== state.reservedActivities.length ||
-      Object.keys(phaseUpdates).some((id) => phaseUpdates[id] !== (state.guidelineSatisfyingPhase[id] ?? null));
+            newReserved.length !== state.reservedActivities.length ||
+            Object.keys(phaseUpdates).some(
+                (id) =>
+                    phaseUpdates[id] !==
+                    (state.guidelineSatisfyingPhase[id] ?? null),
+            );
         if (hasChanges) {
             set({
                 reservedActivities: newReserved,
-                guidelineSatisfyingPhase: { ...state.guidelineSatisfyingPhase, ...phaseUpdates },
+                guidelineSatisfyingPhase: {
+                    ...state.guidelineSatisfyingPhase,
+                    ...phaseUpdates,
+                },
             });
         }
     },
@@ -228,26 +358,37 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
     processReservedActivities: () => {
         get().insertGuidelineActivitiesIfNeeded();
         const state = get();
-        const busySurvivorIds = new Set(state.pendingActivities.map((a) => a.survivorId));
+        const busySurvivorIds = new Set(
+            state.pendingActivities.map((a) => a.survivorId),
+        );
         const { year, hour, minute } = useGameTimeStore.getState();
         const now: GameTimePoint = { year, hour, minute };
         const nowM = toMinutes(now);
-        const survivorIds = [...new Set(state.reservedActivities.map((a) => a.survivorId))];
-        const updates: Partial<ActivityState> = { activityStartTimes: { ...state.activityStartTimes } };
+        const survivorIds = [
+            ...new Set(state.reservedActivities.map((a) => a.survivorId)),
+        ];
+        const updates: Partial<ActivityState> = {
+            activityStartTimes: { ...state.activityStartTimes },
+        };
         let startTimesChanged = false;
 
         for (const survivorId of survivorIds) {
             if (busySurvivorIds.has(survivorId)) continue;
-            const first = state.reservedActivities.find((a) => a.survivorId === survivorId);
+            const first = state.reservedActivities.find(
+                (a) => a.survivorId === survivorId,
+            );
             if (!first) continue;
 
             const waitMin = QUEUE_WAIT[first.type] ?? 10;
             const record = state.activityStartTimes[survivorId];
 
             if (!record || record.activityId !== first.id) {
-        updates.activityStartTimes![survivorId] = { activityId: first.id, startedAt: now };
-        startTimesChanged = true;
-        continue;
+                updates.activityStartTimes![survivorId] = {
+                    activityId: first.id,
+                    startedAt: now,
+                };
+                startTimesChanged = true;
+                continue;
             }
             if (nowM < toMinutes(record.startedAt) + waitMin) continue;
 
@@ -257,7 +398,11 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
         }
 
         for (const survivorId of Object.keys(state.activityStartTimes)) {
-            if (!state.reservedActivities.some((a) => a.survivorId === survivorId)) {
+            if (
+                !state.reservedActivities.some(
+                    (a) => a.survivorId === survivorId,
+                )
+            ) {
                 delete updates.activityStartTimes![survivorId];
                 startTimesChanged = true;
             }

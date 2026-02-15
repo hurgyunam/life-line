@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useActivityStore } from '@/stores/activityStore';
 import { useSurvivorStore } from '@/stores/survivorStore';
 import { useGameTimeStore } from '@/stores/gameTimeStore';
+import { getPendingActivityProgress } from '@/logic/activityProgress';
+import { getConsumableReservedLabelKey } from '@/logic/consumeResourceHelpers';
 import type {
     PendingActivity,
     ReservedActivity,
@@ -41,40 +43,64 @@ function PendingActivityRow({
     survivorName,
     onCancel,
     remaining,
+    progress,
 }: {
     activity: PendingActivity;
     survivorName: string;
     onCancel: (id: string) => void;
     remaining: string;
+    progress: number;
 }) {
     const { t } = useTranslation();
     const labelKey =
         activity.type === 'searchFood'
             ? 'reservedActivity.searchFood'
-            : activity.type === 'restWithSleepingBag'
+            : activity.type === 'consumeResource' && activity.consumableKey
+              ? getConsumableReservedLabelKey(activity.consumableKey)
+              : activity.type === 'restWithSleepingBag'
                 ? 'reservedActivity.restWithSleepingBag'
                 : 'reservedActivity.restAtPlace';
 
+    const showProgress =
+        activity.type === 'consumeResource' || activity.type === 'searchFood';
+
     return (
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2.5 text-sm">
-            <div className="min-w-0 flex-1">
-                <p className="font-medium text-indigo-900 truncate">
-                    {survivorName}
-                </p>
-                <p className="text-indigo-700 text-xs mt-0.5">
-                    {t(labelKey)} · {remaining}
-                </p>
+        <div className="flex flex-col gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2.5 text-sm">
+            <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                    <p className="font-medium text-indigo-900 truncate">
+                        {survivorName}
+                    </p>
+                    <p className="text-indigo-700 text-xs mt-0.5">
+                        {t(labelKey)} · {remaining}
+                    </p>
+                </div>
+                <span className="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium bg-indigo-200 text-indigo-800">
+                    {t('survivorDetail.inProgress')}
+                </span>
+                <button
+                    type="button"
+                    onClick={() => onCancel(activity.id)}
+                    className="rounded border border-indigo-300 bg-white px-2.5 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors shrink-0"
+                >
+                    {t('reservedActivity.remove')}
+                </button>
             </div>
-            <span className="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium bg-indigo-200 text-indigo-800">
-                {t('survivorDetail.inProgress')}
-            </span>
-            <button
-                type="button"
-                onClick={() => onCancel(activity.id)}
-                className="rounded border border-indigo-300 bg-white px-2.5 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors shrink-0"
-            >
-                {t('reservedActivity.remove')}
-            </button>
+            {showProgress && (
+                <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-indigo-700">
+                        <span>{t('survivorDetail.inProgress')}</span>
+                        <span>{progress}%</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-indigo-200">
+                        <div
+                            className="h-full rounded-full bg-indigo-500 transition-all duration-300"
+                            style={{ width: `${progress}%` }}
+                            role="progressbar"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -174,6 +200,10 @@ export function ActivityLog() {
                                         activity.endAt.year,
                                         activity.endAt.hour,
                                         activity.endAt.minute,
+                                    )}
+                                    progress={getPendingActivityProgress(
+                                        activity,
+                                        { year, hour, minute },
                                     )}
                                 />
                             </li>

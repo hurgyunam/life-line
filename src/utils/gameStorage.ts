@@ -1,9 +1,18 @@
 import i18n from '@/i18n';
 import { useSurvivorStore } from '@/stores/survivorStore';
-import { useActivityStore, syncNextActivityId, syncNextReservedId, type PendingActivity, type ReservedActivity } from '@/stores/activityStore';
+import {
+    useActivityStore,
+    syncNextActivityId,
+    syncNextReservedId,
+    type PendingActivity,
+    type ReservedActivity,
+} from '@/stores/activityStore';
 import { useRegionCampStore } from '@/stores/regionCampStore';
 import { useGameTimeStore } from '@/stores/gameTimeStore';
-import { useCampResourceStore, type CampResourceQuantities } from '@/stores/campResourceStore';
+import {
+    useCampResourceStore,
+    type CampResourceQuantities,
+} from '@/stores/campResourceStore';
 import { useTechStore } from '@/stores/techStore';
 import type { Survivor } from '@/types/survivor';
 import type { Facility } from '@/types/facility';
@@ -14,12 +23,12 @@ const SETTINGS_KEY = 'life-line-settings';
 
 /** 게임 설정 스키마 */
 export interface GameSettings {
-  /** 자동 저장 주기(분). 0 = 끄기 */
-  autoSaveIntervalMinutes: number
-  /** 행동 지침 값들 (숫자 또는 문자열) */
-  guidelinesValues: Record<string, number | string>
-  /** 행동 지침 순서 (지침 키 배열) */
-  guidelinesOrder: string[]
+    /** 자동 저장 주기(분). 0 = 끄기 */
+    autoSaveIntervalMinutes: number;
+    /** 행동 지침 값들 (숫자 또는 문자열) */
+    guidelinesValues: Record<string, number | string>;
+    /** 행동 지침 순서 (지침 키 배열) */
+    guidelinesOrder: string[];
 }
 
 const SETTINGS_DEFAULTS: GameSettings = {
@@ -33,7 +42,12 @@ const SETTINGS_DEFAULTS: GameSettings = {
         boredomThreshold: 30,
         restPlace: 'bareGround' as string, // 기본값은 맨 땅
     },
-    guidelinesOrder: ['hungerThreshold', 'tirednessThreshold', 'thirstThreshold', 'boredomThreshold'],
+    guidelinesOrder: [
+        'hungerThreshold',
+        'tirednessThreshold',
+        'thirstThreshold',
+        'boredomThreshold',
+    ],
 };
 
 function getSettingsRaw(): unknown {
@@ -52,7 +66,10 @@ function migrateSettings(parsed: unknown): GameSettings {
     if (parsed && typeof parsed === 'object') {
         const obj = parsed as Record<string, unknown>;
         if (typeof obj.autoSaveIntervalMinutes === 'number') {
-            result.autoSaveIntervalMinutes = Math.max(0, obj.autoSaveIntervalMinutes);
+            result.autoSaveIntervalMinutes = Math.max(
+                0,
+                obj.autoSaveIntervalMinutes,
+            );
         }
         if (obj.guidelinesValues && typeof obj.guidelinesValues === 'object') {
             result.guidelinesValues = {
@@ -80,46 +97,46 @@ export function setSettings(partial: Partial<GameSettings>): void {
         const next = { ...current, ...partial };
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
     } catch {
-    // ignore
+        // ignore
     }
 }
 
 export interface SaveSlot {
-  id: string
-  name: string
-  createdAt: number
-  survivorData: {
-    survivors: Survivor[]
-    pendingActivities: PendingActivity[]
-    reservedActivities: ReservedActivity[]
-    discoveredSurvivorCount: number
-    researchProgress: number
-  }
-  regionData: {
-    regionsWithCamp: string[]
-    facilitiesByRegion: Record<string, Facility[]>
-  }
-  /** 구버전 세이브 호환용 optional */
-  gameTimeData?: {
-    year: number
-    hour: number
-    minute: number
-    isPaused: boolean
-    speed: 1 | 2 | 3
-  }
-  /** 구버전 세이브 호환용 optional */
-  campResourceData?: {
-    quantities: CampResourceQuantities
-  }
-  /** 테크 해금 상태 */
-  techData?: {
-    completedTechIds: string[]
-  }
+    id: string;
+    name: string;
+    createdAt: number;
+    survivorData: {
+        survivors: Survivor[];
+        pendingActivities: PendingActivity[];
+        reservedActivities: ReservedActivity[];
+        discoveredSurvivorCount: number;
+        researchProgress: number;
+    };
+    regionData: {
+        regionsWithCamp: string[];
+        facilitiesByRegion: Record<string, Facility[]>;
+    };
+    /** 구버전 세이브 호환용 optional */
+    gameTimeData?: {
+        year: number;
+        hour: number;
+        minute: number;
+        isPaused: boolean;
+        speed: 1 | 2 | 3;
+    };
+    /** 구버전 세이브 호환용 optional */
+    campResourceData?: {
+        quantities: CampResourceQuantities;
+    };
+    /** 테크 해금 상태 */
+    techData?: {
+        completedTechIds: string[];
+    };
 }
 
 interface StorageData {
-  saves: SaveSlot[]
-  lastLoadedId: string | null
+    saves: SaveSlot[];
+    lastLoadedId: string | null;
 }
 
 function getStorageData(): StorageData {
@@ -155,7 +172,9 @@ function formatSaveDate(createdAt: number): string {
 }
 
 function formatManualSaveName(createdAt: number): string {
-    return i18n.t('settings.saveNameManual', { date: formatSaveDate(createdAt) });
+    return i18n.t('settings.saveNameManual', {
+        date: formatSaveDate(createdAt),
+    });
 }
 
 function formatAutoSaveName(createdAt: number): string {
@@ -221,15 +240,30 @@ export function loadSave(saveId: string): boolean {
     if (!slot) return false;
 
     const { survivorData, regionData, gameTimeData, campResourceData } = slot;
-    let survivors: Survivor[] = Array.isArray(survivorData.survivors) ? survivorData.survivors : useSurvivorStore.getState().survivors;
+    let survivors: Survivor[] = Array.isArray(survivorData.survivors)
+        ? survivorData.survivors
+        : useSurvivorStore.getState().survivors;
 
     // 구버전: 생존자 개인 소지품 → 캠프 재고로 마이그레이션
-    const legacySurvivors = survivors as Array<Survivor & { inventory?: { wildStrawberry?: number; water?: number } }>;
+    const legacySurvivors = survivors as Array<
+        Survivor & { inventory?: { wildStrawberry?: number; water?: number } }
+    >;
     if (legacySurvivors.some((s) => s.inventory)) {
-        const totalWildStrawberry = legacySurvivors.reduce((sum, s) => sum + (s.inventory?.wildStrawberry ?? 0), 0);
-        const totalWater = legacySurvivors.reduce((sum, s) => sum + (s.inventory?.water ?? 0), 0);
-        survivors = legacySurvivors.map(({ inventory: _inv, ...s }) => s as Survivor);
-        if (!campResourceData?.quantities || typeof campResourceData.quantities !== 'object') {
+        const totalWildStrawberry = legacySurvivors.reduce(
+            (sum, s) => sum + (s.inventory?.wildStrawberry ?? 0),
+            0,
+        );
+        const totalWater = legacySurvivors.reduce(
+            (sum, s) => sum + (s.inventory?.water ?? 0),
+            0,
+        );
+        survivors = legacySurvivors.map(
+            ({ inventory: _inv, ...s }) => s as Survivor,
+        );
+        if (
+            !campResourceData?.quantities ||
+            typeof campResourceData.quantities !== 'object'
+        ) {
             useCampResourceStore.setState({
                 quantities: {
                     ...CAMP_RESOURCES_INITIAL,
@@ -240,10 +274,24 @@ export function loadSave(saveId: string): boolean {
         }
     }
 
-    const pendingActivities: PendingActivity[] = Array.isArray(survivorData.pendingActivities)
+    const rawPending = Array.isArray(survivorData.pendingActivities)
         ? survivorData.pendingActivities
         : [];
-    const reservedActivities: ReservedActivity[] = Array.isArray(survivorData.reservedActivities)
+    const pendingActivities: PendingActivity[] = rawPending.map(
+        (a: PendingActivity & { type?: string; consumableKey?: string }) => {
+            if ((a as { type?: string }).type === 'eatWildStrawberry') {
+                return {
+                    ...a,
+                    type: 'consumeResource' as const,
+                    consumableKey: 'wildStrawberry' as const,
+                };
+            }
+            return a as PendingActivity;
+        },
+    );
+    const reservedActivities: ReservedActivity[] = Array.isArray(
+        survivorData.reservedActivities,
+    )
         ? survivorData.reservedActivities
         : [];
 
@@ -264,12 +312,15 @@ export function loadSave(saveId: string): boolean {
     }
 
     const facilitiesByRegion =
-    regionData.facilitiesByRegion && typeof regionData.facilitiesByRegion === 'object'
-        ? (regionData.facilitiesByRegion as Record<string, Facility[]>)
-        : {};
+        regionData.facilitiesByRegion &&
+        typeof regionData.facilitiesByRegion === 'object'
+            ? (regionData.facilitiesByRegion as Record<string, Facility[]>)
+            : {};
 
     useRegionCampStore.setState({
-        regionsWithCamp: Array.isArray(regionData.regionsWithCamp) ? regionData.regionsWithCamp : [],
+        regionsWithCamp: Array.isArray(regionData.regionsWithCamp)
+            ? regionData.regionsWithCamp
+            : [],
         facilitiesByRegion,
     });
 
@@ -283,14 +334,25 @@ export function loadSave(saveId: string): boolean {
         });
     }
 
-    if (campResourceData?.quantities && typeof campResourceData.quantities === 'object') {
+    if (
+        campResourceData?.quantities &&
+        typeof campResourceData.quantities === 'object'
+    ) {
         useCampResourceStore.setState({
-            quantities: { ...CAMP_RESOURCES_INITIAL, ...campResourceData.quantities },
+            quantities: {
+                ...CAMP_RESOURCES_INITIAL,
+                ...campResourceData.quantities,
+            },
         });
     }
 
-    if (slot.techData?.completedTechIds && Array.isArray(slot.techData.completedTechIds)) {
-        useTechStore.getState().setCompletedTechIds(slot.techData.completedTechIds);
+    if (
+        slot.techData?.completedTechIds &&
+        Array.isArray(slot.techData.completedTechIds)
+    ) {
+        useTechStore
+            .getState()
+            .setCompletedTechIds(slot.techData.completedTechIds);
     }
 
     data.lastLoadedId = saveId;
@@ -365,4 +427,3 @@ export function overwriteSave(saveId: string): boolean {
     setStorageData(data);
     return true;
 }
-
