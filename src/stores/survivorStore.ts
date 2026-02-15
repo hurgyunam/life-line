@@ -1,21 +1,172 @@
 import { create } from 'zustand'
 import type { Survivor } from '../types/survivor'
 
+/** 게임 시각 (진행 중 활동 완료 시점 비교용) */
+export interface GameTimePoint {
+  year: number
+  hour: number
+  minute: number
+}
+
+/** 진행 중 활동 (시간이 지나면 완료 처리) */
+export interface PendingActivity {
+  id: string
+  survivorId: string
+  type: 'searchFood'
+  endAt: GameTimePoint
+}
+
+function toMinutes(t: GameTimePoint): number {
+  return t.year * 24 * 60 + t.hour * 60 + t.minute
+}
+
+function addMinutesToPoint(t: GameTimePoint, minutes: number): GameTimePoint {
+  let m = t.minute + minutes
+  let h = t.hour
+  let y = t.year
+  if (m >= 60) {
+    h += Math.floor(m / 60)
+    m = m % 60
+  }
+  if (h >= 24) {
+    y += Math.floor(h / 24)
+    h = h % 24
+  }
+  return { year: y, hour: h, minute: m }
+}
+
+const defaultInventory = { carrot: 10, water: 10 }
+
 const initialSurvivors: Survivor[] = [
-  { id: '1', name: '김민수', age: 32, status: '건강함', currentAction: '당근 농사 진행중', hunger: 85, tiredness: 70, thirst: 90, boredom: 75 },
-  { id: '2', name: '이서연', age: 28, status: '지루함', currentAction: '광산에서 돌 캐는 중', hunger: 60, tiredness: 55, thirst: 45, boredom: 30 },
-  { id: '3', name: '박준호', age: 45, status: '굶주림', currentAction: '요리 중', hunger: 20, tiredness: 65, thirst: 50, boredom: 65 },
-  { id: '4', name: '최지은', age: 24, status: '피로', currentAction: '휴식 중', hunger: 75, tiredness: 25, thirst: 80, boredom: 55 },
-  { id: '5', name: '정현우', age: 38, status: '만족', currentAction: '나무 베는 중', hunger: 90, tiredness: 80, thirst: 85, boredom: 90 },
-  { id: '6', name: '한소희', age: 29, status: '스트레스', currentAction: '수면 중', hunger: 50, tiredness: 15, thirst: 70, boredom: 50 },
-  { id: '7', name: '강민준', age: 41, status: '건강함', currentAction: '연구 중', hunger: 70, tiredness: 60, thirst: 65, boredom: 80 },
-  { id: '8', name: '윤수아', age: 26, status: '지루함', currentAction: '대기 중', hunger: 55, tiredness: 50, thirst: 40, boredom: 25 },
+  { id: '1', name: '김민수', age: 32, status: '건강함', currentAction: '당근 농사 진행중', hunger: 85, tiredness: 70, thirst: 90, boredom: 75, inventory: { ...defaultInventory } },
+  { id: '2', name: '이서연', age: 28, status: '지루함', currentAction: '광산에서 돌 캐는 중', hunger: 60, tiredness: 55, thirst: 45, boredom: 30, inventory: { ...defaultInventory } },
+  { id: '3', name: '박준호', age: 45, status: '굶주림', currentAction: '요리 중', hunger: 20, tiredness: 65, thirst: 50, boredom: 65, inventory: { ...defaultInventory } },
+  { id: '4', name: '최지은', age: 24, status: '피로', currentAction: '휴식 중', hunger: 75, tiredness: 25, thirst: 80, boredom: 55, inventory: { ...defaultInventory } },
+  { id: '5', name: '정현우', age: 38, status: '만족', currentAction: '나무 베는 중', hunger: 90, tiredness: 80, thirst: 85, boredom: 90, inventory: { ...defaultInventory } },
+  { id: '6', name: '한소희', age: 29, status: '스트레스', currentAction: '수면 중', hunger: 50, tiredness: 15, thirst: 70, boredom: 50, inventory: { ...defaultInventory } },
+  { id: '7', name: '강민준', age: 41, status: '건강함', currentAction: '연구 중', hunger: 70, tiredness: 60, thirst: 65, boredom: 80, inventory: { ...defaultInventory } },
+  { id: '8', name: '윤수아', age: 26, status: '지루함', currentAction: '대기 중', hunger: 55, tiredness: 50, thirst: 40, boredom: 25, inventory: { ...defaultInventory } },
 ]
+
+const HUNGER_PER_CARROT = 15
+const THIRST_PER_WATER = 15
+const FOOD_SEARCH_CARROT_GAIN = 1
+const FOOD_SEARCH_DURATION_MINUTES = 60
+const WATER_SEARCH_MIN = 1
+const WATER_SEARCH_MAX = 3
+const RESEARCH_GAIN = 1
 
 interface SurvivorState {
   survivors: Survivor[]
+  /** 진행 중 활동 (1시간 지나면 완료) */
+  pendingActivities: PendingActivity[]
+  /** 발견한 생존자 수 (또 다른 생존자 찾아보기) */
+  discoveredSurvivorCount: number
+  /** 연구 진행도 */
+  researchProgress: number
+  eatCarrot: (survivorId: string) => void
+  drinkWater: (survivorId: string) => void
+  /** 음식 찾기 시작 — 1시간 후 완료 시 당근 1개 추가 */
+  startSearchFood: (survivorId: string, endAt: GameTimePoint) => void
+  /** 현재 시각 기준으로 만료된 진행 중 활동 완료 처리 */
+  completeDueActivities: (now: GameTimePoint) => void
+  searchWater: (survivorId: string) => void
+  searchSurvivor: (survivorId: string) => void
+  doResearch: (survivorId: string) => void
 }
 
-export const useSurvivorStore = create<SurvivorState>(() => ({
+function randomInRange(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+let nextActivityId = 1
+function genActivityId() {
+  return `activity-${nextActivityId++}`
+}
+
+export const useSurvivorStore = create<SurvivorState>((set, get) => ({
   survivors: initialSurvivors,
+  pendingActivities: [],
+  discoveredSurvivorCount: 0,
+  researchProgress: 0,
+  eatCarrot: (survivorId) =>
+    set((state) => ({
+      survivors: state.survivors.map((s) => {
+        if (s.id !== survivorId || s.inventory.carrot <= 0) return s
+        return {
+          ...s,
+          inventory: { ...s.inventory, carrot: s.inventory.carrot - 1 },
+          hunger: Math.min(100, s.hunger + HUNGER_PER_CARROT),
+        }
+      }),
+    })),
+  drinkWater: (survivorId) =>
+    set((state) => ({
+      survivors: state.survivors.map((s) => {
+        if (s.id !== survivorId || s.inventory.water <= 0) return s
+        return {
+          ...s,
+          inventory: { ...s.inventory, water: s.inventory.water - 1 },
+          thirst: Math.min(100, s.thirst + THIRST_PER_WATER),
+        }
+      }),
+    })),
+  startSearchFood: (survivorId, endAt) =>
+    set((state) => ({
+      pendingActivities: [
+        ...state.pendingActivities,
+        { id: genActivityId(), survivorId, type: 'searchFood', endAt },
+      ],
+    })),
+  completeDueActivities: (now) => {
+    const state = get()
+    const nowM = toMinutes(now)
+    const due = state.pendingActivities.filter((a) => toMinutes(a.endAt) <= nowM)
+    if (due.length === 0) return
+    const remaining = state.pendingActivities.filter((a) => !due.includes(a))
+    const newActivities: PendingActivity[] = [...remaining]
+    for (const a of due) {
+      if (a.type === 'searchFood') {
+        newActivities.push({
+          id: genActivityId(),
+          survivorId: a.survivorId,
+          type: 'searchFood',
+          endAt: addMinutesToPoint(now, FOOD_SEARCH_DURATION_MINUTES),
+        })
+      }
+    }
+    set({
+      pendingActivities: newActivities,
+      survivors: state.survivors.map((s) => {
+        const completed = due.filter((a) => a.survivorId === s.id && a.type === 'searchFood')
+        if (completed.length === 0) return s
+        return {
+          ...s,
+          inventory: {
+            ...s.inventory,
+            carrot: s.inventory.carrot + completed.length * FOOD_SEARCH_CARROT_GAIN,
+          },
+        }
+      }),
+    })
+  },
+  searchWater: (survivorId) =>
+    set((state) => ({
+      survivors: state.survivors.map((s) => {
+        if (s.id !== survivorId) return s
+        const gain = randomInRange(WATER_SEARCH_MIN, WATER_SEARCH_MAX)
+        return {
+          ...s,
+          inventory: { ...s.inventory, water: s.inventory.water + gain },
+        }
+      }),
+    })),
+  searchSurvivor: () =>
+    set((state) => ({
+      discoveredSurvivorCount: state.discoveredSurvivorCount + 1,
+    })),
+  doResearch: () =>
+    set((state) => ({
+      researchProgress: state.researchProgress + RESEARCH_GAIN,
+    })),
 }))
