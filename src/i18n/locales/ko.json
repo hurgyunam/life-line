@@ -23,14 +23,14 @@
         "guidelines": "행동 지침"
     },
     "guidelines": {
-        "list": ["배고픔이 30 이하면 야생딸기를 섭취한다."],
+        "list": ["포만도가 30 이하면 야생딸기를 섭취한다."],
         "templates": {
             "wildStrawberryStockThreshold": "야생 딸기 재고가 {{wildStrawberryStockThreshold}}개 이하일 경우 야생 딸기 채취를 한다.",
             "waterStockThreshold": "식수가 {{waterStockThreshold}}개 이하일 때 식수를 구한다.",
-            "hungerThreshold": "배고픔이 {{hungerThreshold}} 이하면 {{foodResource}}을(를) 섭취한다.",
-            "tirednessThreshold": "피곤함이 {{tirednessThreshold}} 이하면 남는 {{sleepingBag}}에서 취침한다.",
-            "thirstThreshold": "목마름이 {{thirstThreshold}} 이하일 경우 식수를 섭취한다.",
-            "boredomThreshold": "지루함이 {{boredomThreshold}} 이하일 경우 {{restPlace}}에서 휴식한다."
+            "hungerThreshold": "포만도가 {{hungerThreshold}} 이하면 {{foodResource}}을(를) 섭취한다.",
+            "tirednessThreshold": "휴식도가 {{tirednessThreshold}} 이하면 남는 {{sleepingBag}}에서 취침한다.",
+            "thirstThreshold": "수분이 {{thirstThreshold}} 이하일 경우 식수를 섭취한다.",
+            "boredomThreshold": "만족도가 {{boredomThreshold}} 이하일 경우 {{restPlace}}에서 휴식한다."
         },
         "editValue": "값 수정",
         "value": "값",
@@ -38,8 +38,8 @@
         "selectSleepingBag": "침낭 선택",
         "selectRestPlace": "휴식 장소 선택",
         "stock": "재고",
-        "hungerGain": "배고픔 회복",
-        "tirednessGain": "피곤함 회복",
+        "hungerGain": "포만 회복",
+        "tirednessGain": "휴식도 회복",
         "researchRequired": "연구를 통해 제작해야만 사용 가능합니다.",
         "sleepingBags": {
             "sleepingBag1": "침낭 1",
@@ -89,10 +89,10 @@
         "inProgress": "진행 중",
         "hoursRequired": "{{hours}}시간 소요",
         "statusIndicators": "상태 지수",
-        "hunger": "배고픔",
-        "tiredness": "피곤함",
-        "thirst": "목마름",
-        "boredom": "지루함"
+        "hunger": "포만",
+        "tiredness": "휴식도",
+        "thirst": "수분",
+        "boredom": "만족도"
     },
     "reservedActivity": {
         "title": "활동 예약",
@@ -162,10 +162,10 @@
         "reason": {
             "wildStrawberryStockThreshold": "야생 딸기 재고가 {{wildStrawberryStockThreshold}}개 이하라서",
             "waterStockThreshold": "식수가 {{waterStockThreshold}}개 이하라서",
-            "hungerThreshold": "배고픔이 {{hungerThreshold}} 이하라서",
-            "thirstThreshold": "목마름이 {{thirstThreshold}} 이하라서",
-            "tirednessThreshold": "피곤함이 {{tirednessThreshold}} 이하라서",
-            "boredomThreshold": "지루함이 {{boredomThreshold}} 이하라서"
+            "hungerThreshold": "포만도가 {{hungerThreshold}} 이하라서",
+            "thirstThreshold": "수분이 {{thirstThreshold}} 이하라서",
+            "tirednessThreshold": "휴식도가 {{tirednessThreshold}} 이하라서",
+            "boredomThreshold": "만족도가 {{boredomThreshold}} 이하라서"
         }
     },
     "dashboard": {
