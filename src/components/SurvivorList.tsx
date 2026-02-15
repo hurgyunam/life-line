@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react'
 import type { Survivor } from '../types/survivor'
+import { GaugeBar } from './GaugeBar'
 
 interface SurvivorListProps {
   survivors: Survivor[]
@@ -89,25 +90,36 @@ export function SurvivorList({ survivors }: SurvivorListProps) {
                 {isExpanded && (
                   <tr className="bg-gray-50">
                     <td colSpan={5} className="px-2 py-3">
-                      <div className="text-gray-600 space-y-2 text-sm">
-                        <div>
-                          <span className="font-medium text-gray-700">이름:</span> {survivor.name}
+                      <div className="text-gray-600 space-y-3 text-sm">
+                        <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2">
+                          <div>
+                            <span className="font-medium text-gray-700">이름:</span> {survivor.name}
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">나이:</span> {survivor.age}세
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">상태:</span>{' '}
+                            <span
+                              className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                statusColors[survivor.status] ?? 'bg-gray-100 text-gray-700'
+                              }`}
+                            >
+                              {survivor.status}
+                            </span>
+                          </div>
+                          <div className="sm:col-span-2">
+                            <span className="font-medium text-gray-700">현재 행동:</span> {survivor.currentAction}
+                          </div>
                         </div>
-                        <div>
-                          <span className="font-medium text-gray-700">나이:</span> {survivor.age}세
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">상태:</span>{' '}
-                          <span
-                            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              statusColors[survivor.status] ?? 'bg-gray-100 text-gray-700'
-                            }`}
-                          >
-                            {survivor.status}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">현재 행동:</span> {survivor.currentAction}
+                        <div className="border-t border-gray-200 pt-3">
+                          <p className="mb-2 text-xs font-medium text-gray-500">상태 지수</p>
+                          <div className="space-y-2">
+                            <GaugeBar label="배고픔" value={survivor.hunger} color="amber" />
+                            <GaugeBar label="피곤함" value={survivor.tiredness} color="blue" />
+                            <GaugeBar label="목마름" value={survivor.thirst} color="slate" />
+                            <GaugeBar label="지루함" value={survivor.boredom} color="green" />
+                          </div>
                         </div>
                       </div>
                     </td>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BottomNav, type NavPage } from './components/BottomNav'
 import { SurvivorList } from './components/SurvivorList'
-import { mockSurvivors } from './data/mockSurvivors'
+import { useSurvivorStore } from './stores/survivorStore'
 
 const pageTitles: Record<NavPage, string> = {
   survivors: '생존자 리스트',
@@ -13,6 +13,7 @@ const pageTitles: Record<NavPage, string> = {
 
 function App() {
   const [currentPage, setCurrentPage] = useState<NavPage>('dashboard')
+  const survivors = useSurvivorStore((state) => state.survivors)
 
   return (
     <div className="min-h-screen bg-gray-200 flex items-center justify-center md:p-4">
@@ -25,7 +26,7 @@ function App() {
         </header>
         <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-24">
           {currentPage === 'survivors' && (
-            <SurvivorList survivors={mockSurvivors} />
+            <SurvivorList survivors={survivors} />
           )}
           {currentPage !== 'survivors' && (
             <div className="flex items-center justify-center min-h-[200px]">
