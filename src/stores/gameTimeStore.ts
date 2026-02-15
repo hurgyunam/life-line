@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { GAME_TIME_CONFIG } from '@/constants/gameConfig'
 
 export type GameSpeed = 1 | 2 | 3
 
@@ -15,9 +16,6 @@ interface GameTimeState {
   advanceByMinutes: (minutes: number) => void
 }
 
-/** 1x 기준: 실시간 1초 ≈ 게임 1분. tick은 100ms마다 호출되므로 1x일 때 한 틱에 6분 진행 */
-const MINUTES_PER_TICK_BASE = 6
-
 export const useGameTimeStore = create<GameTimeState>((set) => ({
   year: 1,
   hour: 8,
@@ -32,17 +30,17 @@ export const useGameTimeStore = create<GameTimeState>((set) => ({
   tick: () =>
     set((state) => {
       if (state.isPaused) return state
-      const add = state.speed * MINUTES_PER_TICK_BASE
+      const add = state.speed * GAME_TIME_CONFIG.MINUTES_PER_TICK_BASE
       let minute = state.minute + add
       let hour = state.hour
       let year = state.year
-      if (minute >= 60) {
-        hour += Math.floor(minute / 60)
-        minute = minute % 60
+      if (minute >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
+        hour += Math.floor(minute / GAME_TIME_CONFIG.MINUTES_PER_HOUR)
+        minute = minute % GAME_TIME_CONFIG.MINUTES_PER_HOUR
       }
-      if (hour >= 24) {
-        year += Math.floor(hour / 24)
-        hour = hour % 24
+      if (hour >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
+        year += Math.floor(hour / GAME_TIME_CONFIG.HOURS_PER_DAY)
+        hour = hour % GAME_TIME_CONFIG.HOURS_PER_DAY
       }
       return { minute, hour, year }
     }),
@@ -52,13 +50,13 @@ export const useGameTimeStore = create<GameTimeState>((set) => ({
       let minute = state.minute + minutes
       let hour = state.hour
       let year = state.year
-      if (minute >= 60) {
-        hour += Math.floor(minute / 60)
-        minute = minute % 60
+      if (minute >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
+        hour += Math.floor(minute / GAME_TIME_CONFIG.MINUTES_PER_HOUR)
+        minute = minute % GAME_TIME_CONFIG.MINUTES_PER_HOUR
       }
-      if (hour >= 24) {
-        year += Math.floor(hour / 24)
-        hour = hour % 24
+      if (hour >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
+        year += Math.floor(hour / GAME_TIME_CONFIG.HOURS_PER_DAY)
+        hour = hour % GAME_TIME_CONFIG.HOURS_PER_DAY
       }
       return { minute, hour, year }
     }),

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import type { Survivor } from '../types/survivor'
+import type { Survivor } from '@/types/survivor'
+import { GAME_TIME_CONFIG, ACTIVITY_BALANCE, SURVIVOR_BALANCE } from '@/constants/gameConfig'
 
 /** 게임 시각 (진행 중 활동 완료 시점 비교용) */
 export interface GameTimePoint {
@@ -17,25 +18,32 @@ export interface PendingActivity {
 }
 
 function toMinutes(t: GameTimePoint): number {
-  return t.year * 24 * 60 + t.hour * 60 + t.minute
+  return (
+    t.year * GAME_TIME_CONFIG.HOURS_PER_DAY * GAME_TIME_CONFIG.MINUTES_PER_HOUR +
+    t.hour * GAME_TIME_CONFIG.MINUTES_PER_HOUR +
+    t.minute
+  )
 }
 
 function addMinutesToPoint(t: GameTimePoint, minutes: number): GameTimePoint {
   let m = t.minute + minutes
   let h = t.hour
   let y = t.year
-  if (m >= 60) {
-    h += Math.floor(m / 60)
-    m = m % 60
+  if (m >= GAME_TIME_CONFIG.MINUTES_PER_HOUR) {
+    h += Math.floor(m / GAME_TIME_CONFIG.MINUTES_PER_HOUR)
+    m = m % GAME_TIME_CONFIG.MINUTES_PER_HOUR
   }
-  if (h >= 24) {
-    y += Math.floor(h / 24)
-    h = h % 24
+  if (h >= GAME_TIME_CONFIG.HOURS_PER_DAY) {
+    y += Math.floor(h / GAME_TIME_CONFIG.HOURS_PER_DAY)
+    h = h % GAME_TIME_CONFIG.HOURS_PER_DAY
   }
   return { year: y, hour: h, minute: m }
 }
 
-const defaultInventory = { carrot: 10, water: 10 }
+const defaultInventory = { 
+  carrot: SURVIVOR_BALANCE.INITIAL_INVENTORY.CARROT, 
+  water: SURVIVOR_BALANCE.INITIAL_INVENTORY.WATER 
+}
 
 const initialSurvivors: Survivor[] = [
   { id: '1', name: '김민수', age: 32, status: '건강함', currentAction: '당근 농사 진행중', hunger: 85, tiredness: 70, thirst: 90, boredom: 75, inventory: { ...defaultInventory } },
@@ -47,14 +55,6 @@ const initialSurvivors: Survivor[] = [
   { id: '7', name: '강민준', age: 41, status: '건강함', currentAction: '연구 중', hunger: 70, tiredness: 60, thirst: 65, boredom: 80, inventory: { ...defaultInventory } },
   { id: '8', name: '윤수아', age: 26, status: '지루함', currentAction: '대기 중', hunger: 55, tiredness: 50, thirst: 40, boredom: 25, inventory: { ...defaultInventory } },
 ]
-
-const HUNGER_PER_CARROT = 15
-const THIRST_PER_WATER = 15
-const FOOD_SEARCH_CARROT_GAIN = 1
-const FOOD_SEARCH_DURATION_MINUTES = 60
-const WATER_SEARCH_MIN = 1
-const WATER_SEARCH_MAX = 3
-const RESEARCH_GAIN = 1
 
 interface SurvivorState {
   survivors: Survivor[]
@@ -96,7 +96,7 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
         return {
           ...s,
           inventory: { ...s.inventory, carrot: s.inventory.carrot - 1 },
-          hunger: Math.min(100, s.hunger + HUNGER_PER_CARROT),
+          hunger: Math.min(100, s.hunger + SURVIVOR_BALANCE.EAT_CARROT_HUNGER_GAIN),
         }
       }),
     })),
@@ -107,7 +107,7 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
         return {
           ...s,
           inventory: { ...s.inventory, water: s.inventory.water - 1 },
-          thirst: Math.min(100, s.thirst + THIRST_PER_WATER),
+          thirst: Math.min(100, s.thirst + SURVIVOR_BALANCE.DRINK_WATER_THIRST_GAIN),
         }
       }),
     })),
@@ -131,7 +131,7 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
           id: genActivityId(),
           survivorId: a.survivorId,
           type: 'searchFood',
-          endAt: addMinutesToPoint(now, FOOD_SEARCH_DURATION_MINUTES),
+          endAt: addMinutesToPoint(now, ACTIVITY_BALANCE.FOOD_SEARCH.DURATION_HOURS * GAME_TIME_CONFIG.MINUTES_PER_HOUR),
         })
       }
     }
@@ -144,7 +144,7 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
           ...s,
           inventory: {
             ...s.inventory,
-            carrot: s.inventory.carrot + completed.length * FOOD_SEARCH_CARROT_GAIN,
+            carrot: s.inventory.carrot + completed.length * ACTIVITY_BALANCE.FOOD_SEARCH.CARROT_GAIN,
           },
         }
       }),
@@ -154,7 +154,7 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
     set((state) => ({
       survivors: state.survivors.map((s) => {
         if (s.id !== survivorId) return s
-        const gain = randomInRange(WATER_SEARCH_MIN, WATER_SEARCH_MAX)
+        const gain = randomInRange(ACTIVITY_BALANCE.WATER_SEARCH.GAIN_MIN, ACTIVITY_BALANCE.WATER_SEARCH.GAIN_MAX)
         return {
           ...s,
           inventory: { ...s.inventory, water: s.inventory.water + gain },
@@ -167,6 +167,6 @@ export const useSurvivorStore = create<SurvivorState>((set, get) => ({
     })),
   doResearch: () =>
     set((state) => ({
-      researchProgress: state.researchProgress + RESEARCH_GAIN,
+      researchProgress: state.researchProgress + ACTIVITY_BALANCE.RESEARCH.PROGRESS_GAIN,
     })),
 }))

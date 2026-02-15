@@ -4,6 +4,13 @@ alwaysApply: true
 
 이 프로젝트는 yarn을 사용합니다. npm 대신 yarn 명령어를 사용하세요.
 
+## 프로젝트 아키텍처 및 규칙
+
+- **절대 경로 사용**: 모든 `src/` 하위 파일 참조 시 `@/` 별칭(alias)을 사용합니다. (예: `import { ... } from '@/components/...'`)
+- **게임 밸런스 데이터 관리**: 모든 수치 데이터(시간, 보상, 확률 등)는 `@/constants/gameConfig.ts`에서 중앙 관리합니다. 하드코딩을 지양하세요.
+- **컴포넌트 분리**: 목록 컴포넌트(`List`)와 상세 항목 컴포넌트(`DetailRow`, `Item`)는 서로 분리하여 가독성과 유지보수성을 높입니다.
+- **상태 관리**: Zustand를 사용하여 전역 상태를 관리하며, 비즈니스 로직은 최대한 Store 내부에서 처리합니다.
+
 ## 환경 관련 참고사항
 
 - **Yarn v1**: 프로젝트가 Yarn v1(Classic)을 사용합니다. `yarn dlx`는 Yarn 2+ 전용이므로 사용 불가. 일회성 CLI 실행 시 `npm create <package>` 또는 `npx`를 사용하세요.

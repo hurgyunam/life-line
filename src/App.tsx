@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { BottomNav, type NavPage } from './components/BottomNav'
-import { GameHeader } from './components/GameHeader'
-import { SurvivorList } from './components/SurvivorList'
-import { useGameTimeStore } from './stores/gameTimeStore'
-import { useSurvivorStore } from './stores/survivorStore'
+import { BottomNav, type NavPage } from '@/components/BottomNav'
+import { GameHeader } from '@/components/GameHeader'
+import { SurvivorList } from '@/components/SurvivorList'
+import { useGameTimeStore } from '@/stores/gameTimeStore'
+import { useSurvivorStore } from '@/stores/survivorStore'
 
 const pageTitles: Record<NavPage, string> = {
   survivors: '생존자 리스트',
