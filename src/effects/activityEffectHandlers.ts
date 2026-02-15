@@ -1,5 +1,5 @@
 /**
- * 이펙트 핸들러 등록
+ * 활동 이펙트 핸들러
  *
  * 앱 부트 시 호출. survivorStore, campResourceStore, activityStore 등에 대한
  * 결합을 이 파일에만 두고, 각 스토어는 서로를 직접 참조하지 않습니다.
@@ -13,7 +13,7 @@ import { useRestPlaceStore } from '@/stores/restPlaceStore'
 import { useCampResourceStore } from '@/stores/campResourceStore'
 import { useSurvivorStore } from '@/stores/survivorStore'
 import { useActivityStore } from '@/stores/activityStore'
-import { registerActivityEffect, registerUpdateSurvivorStat } from '@/stores/effectRegistry'
+import { registerActivityEffect, registerUpdateSurvivorStat } from '@/effects/activityEffectRegistry'
 import type { SleepingBag } from '@/types/sleepingBag'
 import type { RestPlace } from '@/types/restPlace'
 

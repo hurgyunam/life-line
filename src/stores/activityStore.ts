@@ -2,7 +2,7 @@
  * 활동 관리 스토어 (예약/진행 중 활동, 지침, 연구 등)
  *
  * survivorStore를 직접 import하지 않습니다.
- * 욕구 관련 부수 효과는 effectRegistry.runActivityEffect()로 실행합니다.
+ * 욕구 관련 부수 효과는 activityEffectRegistry.runActivityEffect()로 실행합니다.
  */
 
 import { create } from 'zustand'
@@ -12,7 +12,7 @@ import { GAME_TIME_CONFIG, ACTIVITY_BALANCE } from '@/constants/gameConfig'
 import { getGuidelineActivityForSurvivor } from '@/logic/guidelineActivities'
 import { getSettings } from '@/utils/gameStorage'
 import { useGameTimeStore } from '@/stores/gameTimeStore'
-import { runActivityEffect, runUpdateSurvivorStat } from '@/stores/effectRegistry'
+import { runActivityEffect, runUpdateSurvivorStat } from '@/effects/activityEffectRegistry'
 import {
   toMinutes,
   addMinutesToPoint,
